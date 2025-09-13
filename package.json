@@ -18,6 +18,8 @@
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "firebase": "^12.2.1",
+    "fs": "^0.0.1-security",
+    "https": "^1.0.0",
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",

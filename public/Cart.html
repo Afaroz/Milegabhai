@@ -111,8 +111,7 @@
 
       async function loadCartFromServer() {
         try {
-          const res = await fetch(
-            `http://10.146.16.7:4000/api/cart?email=${encodeURIComponent(normalizedEmail)}`
+          const res = await fetch(`https://milegabhai.onrender.com/api/cart?email=${encodeURIComponent(normalizedEmail)}`
           );
           if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
           const cart = await res.json();

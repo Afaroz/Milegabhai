@@ -25,6 +25,7 @@ const User = mongoose.model('User', userSchema);
 const app = express();
 const PORT = 4000;
 
+const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -51,9 +52,12 @@ const imageFilter = (req, file, cb) =>
 
 const upload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+
+
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.log('MongoDB connection error:', err));
 
 // Login
 app.post('/login', async (req, res) => {
@@ -396,5 +400,5 @@ app.delete('/api/products/:id', async (req, res) => {
 
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+  console.log(`🚀 Server running at https://0.0.0.0:${PORT}`);
 });

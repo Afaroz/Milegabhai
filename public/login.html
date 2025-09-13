@@ -136,7 +136,8 @@
       const messageBox = document.getElementById('messageBox');
 
       try {
-        const res = await fetch('http://10.146.16.7:4000/login', {
+        // Use HTTPS endpoint instead of HTTP
+        const res = await fetch('https://milegabhai.onrender.com/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -148,15 +149,11 @@
           messageBox.style.color = 'var(--success)';
           messageBox.textContent = 'Login successful! Redirecting...';
 
-          // Store in localStorage
+          // Store user data in localStorage
           localStorage.setItem('user', JSON.stringify(data.user));
 
-          // After successful login:
-localStorage.setItem("token", data.token);
-
-
           setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'index.html';  // Redirect to homepage
           }, 1500);
         } else {
           messageBox.style.color = 'var(--error)';
