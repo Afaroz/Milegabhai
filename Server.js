@@ -51,8 +51,7 @@ const imageFilter = (req, file, cb) =>
 
 const upload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/myappdb')
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
