@@ -2,457 +2,450 @@
 <html lang="en">
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Milega Bhai - Products</title>
   <style>
-/* Base styles */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f8f8f8;
-}
-header {
-  background-color: #002f34;
-  color: white;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  z-index: 20;
-  flex-wrap: nowrap;
-}
+    /* Base styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+    }
+    header {
+      background-color: #002f34;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 20;
+      flex-wrap: nowrap;
+    }
 
-/* Hamburger menu icon */
-.hamburger {
-  font-size: 28px;
-  cursor: pointer;
-  user-select: none;
-  flex-shrink: 0; /* prevent shrinking */
-}
+    /* Hamburger menu icon */
+    .hamburger {
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      flex-shrink: 0; /* prevent shrinking */
+    }
 
-/* Logo styling */
-.logo {
-  font-size: 28px;
-  font-weight: 700;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  background: linear-gradient(90deg, #3b82f6, #06b6d4);
-  background-clip: text;
-  -webkit-background-clip: text; /* ensures Safari/Chrome support */
-  -webkit-text-fill-color: transparent;
-  color: transparent; /* fallback */
-  white-space: nowrap;
-  margin-left: auto;
-  flex-shrink: 0;
-  letter-spacing: -0.5px;
-  user-select: none;
-  cursor: default;
-}
+    /* Logo styling */
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      background-clip: text;
+      -webkit-background-clip: text; /* ensures Safari/Chrome support */
+      -webkit-text-fill-color: transparent;
+      color: transparent; /* fallback */
+      white-space: nowrap;
+      margin-left: auto;
+      flex-shrink: 0;
+      letter-spacing: -0.5px;
+      user-select: none;
+      cursor: default;
+    }
 
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: row;
+        justify-content: flex-start;
+      }
 
+      .hamburger {
+        order: 1;
+      }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  header {
-    flex-direction: row;
-    justify-content: flex-start;
-  }
+      .logo {
+        order: 2;
+        margin-left: auto;
+        font-size: 24px; /* Optional: slightly smaller logo on mobile */
+      }
+    }
 
-  .hamburger {
-    order: 1;
-  }
+    /* Hide original nav-buttons on desktop */
+    .nav-buttons {
+      display: none;
+    }
 
-  .logo {
-    order: 2;
-    margin-left: auto;
-    font-size: 24px; /* Optional: slightly smaller logo on mobile */
-  }
-}
+    /* Slide-in menu styles */
+    .slide-menu {
+      position: fixed;
+      top: 0;
+      left: -300px; /* hidden by default */
+      width: 280px;
+      height: 100vh;
+      background-color: #fbfdfd;
+      padding: 20px;
+      box-sizing: border-box;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.5);
+      transition: left 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
+    .slide-menu.active {
+      left: 0;
+    }
 
-/* Hide original nav-buttons on desktop */ 
-.nav-buttons {
-  display: none;
-}
+    /* Close button inside the slide menu */
+    .close-btn {
+      background: none;
+      border: none;
+      color: rgb(5, 1, 1);
+      font-size: 28px;
+      align-self: flex-end;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
 
-/* Slide-in menu styles */
-.slide-menu {
-  position: fixed;
-  top: 0;
-  left: -300px; /* hidden by default */
-  width: 280px;
-  height: 100vh;
-  background-color: #fbfdfd;
-  padding: 20px;
-  box-sizing: border-box;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.5);
-  transition: left 0.3s ease;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+    /* Buttons inside slide menu */
+    .slide-menu .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-.slide-menu.active {
-  left: 0;
-}
+    /* Buttons inside slide menu (styled <a> tags) */
+    .slide-menu .nav-buttons a {
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      gap: 10px;
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      background-color: white;
+      color: #002f34;
+      transition: background-color 0.2s ease;
+      width: 60%;
+    }
 
-/* Close button inside the slide menu */
-.close-btn {
-  background: none;
-  border: none;
-  color: rgb(5, 1, 1);
-  font-size: 28px;
-  align-self: flex-end;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
+    .slide-menu .nav-buttons a:hover {
+      background-color: #ddd;
+    }
 
-/* Buttons inside slide menu */
-.slide-menu .nav-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+    /* Sell button specific */
+    .slide-menu .nav-buttons .sell-btn {
+      background-color: #ffce32;
+      color: #000;
+    }
 
-/* Buttons inside slide menu (styled <a> tags) */
-.slide-menu .nav-buttons a {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  gap: 10px;
-  padding: 12px 16px;
-  font-size: 16px;
-  border-radius: 6px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  background-color: white;
-  color: #002f34;
-  transition: background-color 0.2s ease;
-  width: 60%;
-}
+    /* Search bar styling */
+    .search-bar {
+      margin: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .search-bar input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .search-bar button {
+      width: 15%;
+      padding: 10px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
 
-.slide-menu .nav-buttons a:hover {
-  background-color: #eee;
-}
+    /* Product card styles */
+    .products-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      gap: 20px;
+      margin: 20px;
+    }
 
-/* Sell button specific */
-.slide-menu .nav-buttons .sell-btn {
-  background-color: #ffce32;
-  color: #000;
-}
-/* Hover effect */
-.slide-menu .nav-buttons a:hover {
-  background-color: #ddd;
-}
+    .product-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 250px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+    }
 
+    .product-card img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
 
+    .product-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
 
+    .product-price {
+      font-size: 16px;
+      color: #3b82f6;
+      margin-bottom: 10px;
+    }
 
+    .product-location {
+      font-size: 14px;
+      color: #888;
+    }
 
+    /* Profile sliding panel */
+    .profile-slide {
+      position: fixed;
+      top: 0;
+      left: 100%;
+      width: 300px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1100;
+    }
 
+    .profile-slide.active {
+      left: 0;
+    }
 
+    .profile-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
 
+    .info-row {
+      margin-bottom: 15px;
+    }
+
+    .info-row div {
+      font-weight: bold;
+    }
+
+    .logout-btn {
+      padding: 10px 20px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    footer {
+      background-color: #002f34;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    footer a {
+      color: white;
+      margin: 0 10px;
+    }
   </style>
 </head>
 <body>
-<header>
-  <div class="hamburger" id="hamburger">&#9776;</div>
-  <div class="logo">Milega Bhai</div>
-</header>
+  <header>
+    <div class="hamburger" id="hamburger">&#9776;</div>
+    <div class="logo">Milega Bhai</div>
+  </header>
 
-
-<!-- Slide-in menu panel -->
-<div class="slide-menu" id="slideMenu">
-  <button class="close-btn" id="closeBtn">&times;</button>
-<div class="nav-buttons">
-<!-- Place this inside your nav/header -->
-<button class="profile-icon-btn" id="profileBtn" aria-label="Profile">
-  <i class="fas fa-user"></i>
-</button>
-
-
-  <a href="sell.html" class="sell-btn"><i class="fas fa-tag"></i> Sell</a>
-  <a href="register.html" class="register-btn"><i class="fas fa-user-plus"></i> Register</a>
-  <a href="login.html" class="login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
-  <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Cart</a>
-  <a href="Live.html" class="live-btn"><i class="fas fa-box"></i> Live Products</a>
-  <a href="setting.html" class="setting-btn"><i class="fas fa-cog"></i> Settings</a>
-  <a href="help.html" class="help-btn"><i class="fas fa-question-circle"></i> Help</a>
-</div>
-
-</div>
-
-<script>
-  const hamburger = document.getElementById('hamburger');
-  const slideMenu = document.getElementById('slideMenu');
-  const closeBtn = document.getElementById('closeBtn');
-
-  hamburger.addEventListener('click', () => {
-    slideMenu.classList.add('active');
-  });
-
-  closeBtn.addEventListener('click', () => {
-    slideMenu.classList.remove('active');
-  });
-
-  // Optional: close menu if clicked outside
-  window.addEventListener('click', (e) => {
-    if (!slideMenu.contains(e.target) && !hamburger.contains(e.target)) {
-      slideMenu.classList.remove('active');
-    }
-  });
-</script>
-
-  <div class="search-bar">
-    <input type="text" placeholder="Search for cars, phones, furniture..." />
-    <button>Search</button>
-  </div>
-
-  <div class="products-container" id="productsContainer">
-    <!-- Products will be injected here by JS -->
-  </div>
-
-  <!-- Sliding Profile Card -->
-  <div class="profile-slide" id="profileSlide">
-    <button class="close-btn" id="closeProfile">&times;</button>
-    <img id="profileImage" class="profile-image" src="" alt="User Profile Image" title="Click to change image" />
-    <label id="imageUploadLabel" for="imageUpload">Change Profile Image</label>
-    <input type="file" id="imageUpload" accept="image/*" />
-    <div class="profile-info">
-      <h1>Your Profile</h1>
-      <div class="info-row"><div>Full Name</div><span id="fullname">Loading...</span></div>
-      <div class="info-row"><div>Email</div><span id="email">Loading...</span></div>
-      <div class="info-row"><div>Mobile</div><span id="mobile">Loading...</span></div>
-      <div class="info-row"><div>Location</div><span id="location">Loading...</span></div>
+  <!-- Slide-in menu panel -->
+  <div class="slide-menu" id="slideMenu">
+    <button class="close-btn" id="closeBtn">&times;</button>
+    <div class="nav-buttons">
+      <button class="profile-icon-btn" id="profileBtn" aria-label="Profile">
+        <i class="fas fa-user"></i>
+      </button>
+      <a href="sell.html" class="sell-btn"><i class="fas fa-tag"></i> Sell</a>
+      <a href="register.html" class="register-btn"><i class="fas fa-user-plus"></i> Register</a>
+      <a href="login.html" class="login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+      <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Cart</a>
+      <a href="Live.html" class="live-btn"><i class="fas fa-box"></i> Live Products</a>
+      <a href="setting.html" class="setting-btn"><i class="fas fa-cog"></i> Settings</a>
+      <a href="help.html" class="help-btn"><i class="fas fa-question-circle"></i> Help</a>
     </div>
-    <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
-<script>
 
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const slideMenu = document.getElementById('slideMenu');
+    const closeBtn = document.getElementById('closeBtn');
 
-
-let allProducts = [];
-
-async function fetchProducts() {
-  try {
-   const res = await fetch('https://milegabhai.onrender.com/api/products');
-
-    allProducts = await res.json();
-    displayProducts(allProducts);
-  } catch (err) {
-    console.error('Failed to fetch products', err);
-  }
-}
-
-function displayProducts(products) {
-  const container = document.getElementById('productsContainer');
-  container.innerHTML = '';
-
-  if (products.length === 0) {
-    container.innerHTML = '<p>No products found.</p>';
-    return;
-  }
-
-  products.forEach(product => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <img class="product-image" src="${product.image}" alt="${product.title}" />
-      <div class="product-info">
-        <h4 class="product-title">${product.title}</h4>
-        <p class="product-price">₹${product.price.toLocaleString()}</p>
-        <p class="product-location">📍 ${product.location}</p>
-      </div>
-    `;
-
-    // Redirect to product detail on click
-    card.querySelector('.product-image').addEventListener('click', () => {
-      window.location.href = `product-detail.html?id=${product._id}`;
+    hamburger.addEventListener('click', () => {
+      slideMenu.classList.add('active');
     });
 
-    container.appendChild(card);
-  });
-}
+    closeBtn.addEventListener('click', () => {
+      slideMenu.classList.remove('active');
+    });
 
-// Search functionality
-const searchInput = document.querySelector('.search-bar input');
-const searchButton = document.querySelector('.search-bar button');
-
-function handleSearch(query) {
-  const trimmed = query.toLowerCase().trim();
-
-  if (trimmed === '') {
-    displayProducts(allProducts); // show all if empty
-  } else {
-    const filtered = allProducts.filter(product =>
-      product.title.toLowerCase().includes(trimmed)
-    );
-    displayProducts(filtered);
-  }
-}
-
-searchButton.addEventListener('click', () => {
-  handleSearch(searchInput.value);
-});
-
-searchInput.addEventListener('keypress', e => {
-  if (e.key === 'Enter') {
-    handleSearch(searchInput.value);
-  }
-});
-
-// ✅ NEW: Auto-restore when input is cleared
-searchInput.addEventListener('input', () => {
-  handleSearch(searchInput.value);
-});
-
-// Sell button check
-document.querySelector('.sell-btn').addEventListener('click', function (e) {
-  const user = localStorage.getItem('user');
-  if (!user) {
-    e.preventDefault();
-    alert('Please log in to post a product.');
-    window.location.href = 'login.html';
-  }
-});
-
-fetchProducts();
-
-
-  document.querySelector('.sell-btn').addEventListener('click', function (e) {
-    const user = localStorage.getItem('user');
-    if (!user) {
-      e.preventDefault();
-      alert('Please log in to post a product.');
-      window.location.href = 'login.html';
-    }
-  });
-
-  
-
-  // --- Sliding Profile Logic ---
-  const profileSlide = document.getElementById("profileSlide");
-  const profileBtn = document.getElementById("profileBtn");
-  const closeProfile = document.getElementById("closeProfile");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const profileImage = document.getElementById("profileImage");
-  const fullnameSpan = document.getElementById("fullname");
-  const emailSpan = document.getElementById("email");
-  const mobileSpan = document.getElementById("mobile");
-  const locationSpan = document.getElementById("location");
-  const imageUpload = document.getElementById("imageUpload");
-
-  function loadUserProfile() {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      profileImage.src = user.image || "https://img.freepik.com/free-icon/user_318-159711.jpg";
-      fullnameSpan.textContent = user.fullname || "N/A";
-      emailSpan.textContent = user.email || "N/A";
-      mobileSpan.textContent = user.mobile || "N/A";
-      locationSpan.textContent = user.location || "N/A";
-    } else {
-      profileImage.src = "https://img.freepik.com/free-icon/user_318-159711.jpg";
-      fullnameSpan.textContent = "Not Logged In";
-      emailSpan.textContent = "-";
-      mobileSpan.textContent = "-";
-      locationSpan.textContent = "-";
-    }
-  }
-
-  profileBtn.addEventListener("click", () => {
-    loadUserProfile();
-    profileSlide.classList.add("active");
-  });
-
-  closeProfile.addEventListener("click", () => {
-    profileSlide.classList.remove("active");
-  });
-
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("user");
-    alert("Logged out successfully");
-    profileSlide.classList.remove("active");
-    window.location.href = 'login.html';
-  });
-
-  // ✅ Only Label Triggers File Selection Now
-  // profileImage click handler removed to prevent double prompt
-
-  // ✅ Upload image to backend
-  imageUpload.addEventListener("change", async function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file.");
-      return;
-    }
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || !user.email) {
-      alert("No user found. Please login.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("profileImage", file);
-    formData.append("email", user.email);
-
-    try {
-      const response = await fetch("https://milegabhai.onrender.com/api/uploadProfileImage", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        const imageUrl = data.imageUrl;
-        profileImage.src = imageUrl;
-        user.image = imageUrl;
-        localStorage.setItem("user", JSON.stringify(user));
-        alert("✅ Profile image updated!");
-      } else {
-        alert("❌ Failed to upload image.");
-        console.error(data.message);
+    window.addEventListener('click', (e) => {
+      if (!slideMenu.contains(e.target) && !hamburger.contains(e.target)) {
+        slideMenu.classList.remove('active');
       }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("❌ Error uploading image.");
+    });
+
+    // Fetch products
+    let allProducts = [];
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch('https://milegabhai.onrender.com/api/products');
+        allProducts = await res.json();
+        displayProducts(allProducts);
+      } catch (err) {
+        console.error('Failed to fetch products', err);
+      }
     }
-  });
-</script>
 
+    function displayProducts(products) {
+      const container = document.getElementById('productsContainer');
+      container.innerHTML = '';
 
-<footer style="background-color:#002f34; color:white; padding: 30px 20px; text-align: center; margin-top: 50px;">
-  <div style="max-width: 1000px; margin: auto;">
-    <h3 style="margin-bottom: 10px;">Milega Bhai</h3>
-    <p style="line-height: 1.6;">
-      Milega Bhai is your one-stop platform for buying and selling products online.<br>
-      Fast, secure, and user-friendly experience for everyone.
-    </p>
+      if (products.length === 0) {
+        container.innerHTML = '<p>No products found.</p>';
+        return;
+      }
 
-    <div style="margin: 20px 0;">
-      <a href="register.html" style="color: white; margin: 0 10px;">Register</a> |
-      <a href="login.html" style="color: white; margin: 0 10px;">Login</a> |
-      <a href="sell.html" style="color: white; margin: 0 10px;">Sell</a> |
-      <a href="profile.html" style="color: white; margin: 0 10px;">Profile</a>
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img class="product-image" src="${product.image}" alt="${product.title}" />
+          <div class="product-info">
+            <h4 class="product-title">${product.title}</h4>
+            <p class="product-price">₹${product.price.toLocaleString()}</p>
+            <p class="product-location">📍 ${product.location}</p>
+          </div>
+        `;
+        card.querySelector('.product-image').addEventListener('click', () => {
+          window.location.href = `product-detail.html?id=${product._id}`;
+        });
+        container.appendChild(card);
+      });
+    }
+
+    fetchProducts();
+
+    // Search functionality
+    const searchInput = document.querySelector('.search-bar input');
+    const searchButton = document.querySelector('.search-bar button');
+
+    function handleSearch(query) {
+      const trimmed = query.toLowerCase().trim();
+      if (trimmed === '') {
+        displayProducts(allProducts);
+      } else {
+        const filtered = allProducts.filter(product =>
+          product.title.toLowerCase().includes(trimmed)
+        );
+        displayProducts(filtered);
+      }
+    }
+
+    searchButton.addEventListener('click', () => {
+      handleSearch(searchInput.value);
+    });
+
+    searchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        handleSearch(searchInput.value);
+      }
+    });
+
+    // Auto-restore search on input
+    searchInput.addEventListener('input', () => {
+      handleSearch(searchInput.value);
+    });
+
+    // Profile slide logic
+    const profileSlide = document.getElementById("profileSlide");
+    const profileBtn = document.getElementById("profileBtn");
+    const closeProfile = document.getElementById("closeProfile");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const profileImage = document.getElementById("profileImage");
+    const fullnameSpan = document.getElementById("fullname");
+    const emailSpan = document.getElementById("email");
+    const mobileSpan = document.getElementById("mobile");
+    const locationSpan = document.getElementById("location");
+
+    function loadUserProfile() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        profileImage.src = user.image || "https://img.freepik.com/free-icon/user_318-159711.jpg";
+        fullnameSpan.textContent = user.fullname || "N/A";
+        emailSpan.textContent = user.email || "N/A";
+        mobileSpan.textContent = user.mobile || "N/A";
+        locationSpan.textContent = user.location || "N/A";
+      } else {
+        profileImage.src = "https://img.freepik.com/free-icon/user_318-159711.jpg";
+        fullnameSpan.textContent = "Not Logged In";
+        emailSpan.textContent = "-";
+        mobileSpan.textContent = "-";
+        locationSpan.textContent = "-";
+      }
+    }
+
+    profileBtn.addEventListener("click", () => {
+      loadUserProfile();
+      profileSlide.classList.add("active");
+    });
+
+    closeProfile.addEventListener("click", () => {
+      profileSlide.classList.remove("active");
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("user");
+      alert("Logged out successfully");
+      profileSlide.classList.remove("active");
+      window.location.href = 'login.html';
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <h3>Milega Bhai</h3>
+      <p>
+        Milega Bhai is your one-stop platform for buying and selling products online.<br>
+        Fast, secure, and user-friendly experience for everyone.
+      </p>
+      <div>
+        <a href="register.html">Register</a> |
+        <a href="login.html">Login</a> |
+        <a href="sell.html">Sell</a> |
+        <a href="profile.html">Profile</a>
+      </div>
+      <div>
+        <a href="https://instagram.com" target="_blank">📸 Instagram</a>
+        <a href="https://facebook.com" target="_blank">📘 Facebook</a>
+        <a href="https://twitter.com" target="_blank">🐦 Twitter</a>
+      </div>
+      <p>&copy; 2025 Milega Bhai. All rights reserved.</p>
     </div>
-
-    <div style="margin-top: 20px;">
-      <a href="https://instagram.com" target="_blank" style="color:white; margin: 0 10px;">📸 Instagram</a>
-      <a href="https://facebook.com" target="_blank" style="color:white; margin: 0 10px;">📘 Facebook</a>
-      <a href="https://twitter.com" target="_blank" style="color:white; margin: 0 10px;">🐦 Twitter</a>
-    </div>
-
-    <p style="color: #ccc; margin-top: 30px;">&copy; 2025 Milega Bhai. All rights reserved.</p>
-  </div>
-</footer>
-
+  </footer>
 </body>
 </html>
