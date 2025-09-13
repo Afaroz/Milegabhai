@@ -182,7 +182,7 @@
 
       async function deleteFromCart(productId) {
   try {
-    const url = `http://10.146.16.7:4000/api/cart?email=${encodeURIComponent(normalizedEmail)}&productId=${encodeURIComponent(productId)}`;
+    const url = `https://milegabhai.onrender.com/api/cart?email=${encodeURIComponent(normalizedEmail)}&productId=${encodeURIComponent(productId)}`;
     const res = await fetch(url, {
       method: 'DELETE'
     });
