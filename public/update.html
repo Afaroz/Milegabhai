@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Update Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 30px;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-bottom: 25px;
+      color: #007bff;
+    }
+    form {
+      margin-bottom: 40px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    button {
+      background-color: #007bff;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .section-title {
+      margin-bottom: 15px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+    .success-message,
+    .error-message {
+      margin-top: 15px;
+      font-weight: 700;
+    }
+    .success-message {
+      color: green;
+    }
+    .error-message {
+      color: red;
+    }
+    .image-preview {
+      margin-bottom: 15px;
+    }
+    .image-preview img {
+      max-width: 150px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Update Profile</h2>
+    <form id="profileForm">
+      <label for="fullname">Full Name</label>
+      <input type="text" id="fullname" name="fullname" value="Shaikh" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="Shaikh@gmail.com" required />
+
+      <label for="mobile">Mobile Number</label>
+      <input type="tel" id="mobile" name="mobile" value="7387304707" pattern="[0-9]{10}" title="10 digit mobile number" required />
+
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" value="Nanded" required />
+
+      <label for="image">Profile Image</label>
+      <input type="file" id="image" name="image" accept="image/*" />
+      <div class="image-preview" id="imagePreview"></div>
+
+      <button type="submit">Update Profile</button>
+      <div id="profileMessage"></div>
+    </form>
+
+    <h2 class="section-title">Change Password</h2>
+    <form id="passwordForm">
+      <label for="currentPassword">Current Password</label>
+      <input type="password" id="currentPassword" name="currentPassword" required />
+
+      <label for="newPassword">New Password</label>
+      <input type="password" id="newPassword" name="newPassword" minlength="6" required />
+
+      <label for="confirmPassword">Confirm New Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" minlength="6" required />
+
+      <button type="submit">Change Password</button>
+      <div id="passwordMessage"></div>
+    </form>
+  </div>
+
+  <script>
+    // Image preview logic
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('imagePreview');
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      imagePreview.innerHTML = '';
+      if (file) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src); // free memory
+        imagePreview.appendChild(img);
+      }
+    });
+
+    // Profile update form submit
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('profileMessage');
+      message.textContent = '';
+      message.className = '';
+
+      // Collect data
+      const formData = new FormData(e.target);
+
+      // For demonstration, simulate API call with timeout
+      try {
+        // Here you would send formData to your backend API
+        // e.g., await fetch('/api/profile/update', { method: 'POST', body: formData })
+
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        message.textContent = 'Profile updated successfully!';
+        message.className = 'success-message';
+      } catch (error) {
+        message.textContent = 'Error updating profile. Please try again.';
+        message.className = 'error-message';
+      }
+    });
+
+    // Password change form submit
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('passwordMessage');
+      message.textContent = '';
+      message.className = '';
+
+      const currentPassword = e.target.currentPassword.value.trim();
+      const newPassword = e.target.newPassword.value.trim();
+      const confirmPassword = e.target.confirmPassword.value.trim();
+
+      if (newPassword !== confirmPassword) {
+        message.textContent = 'New password and confirmation do not match.';
+        message.className = 'error-message';
+        return;
+      }
+      if (newPassword.length < 6) {
+        message.textContent = 'New password must be at least 6 characters.';
+        message.className = 'error-message';
+        return;
+      }
+
+      try {
+        // Send password change request to backend
+        // e.g., await fetch('/api/profile/change-password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }), headers: { 'Content-Type': 'application/json' }})
+
+        // Simulate delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        message.textContent = 'Password changed successfully!';
+        message.className = 'success-message';
+        e.target.reset();
+      } catch (error) {
+        message.textContent = 'Error changing password. Please check your current password and try again.';
+        message.className = 'error-message';
+      }
+    });
+  </script>
+</body>
+</html>

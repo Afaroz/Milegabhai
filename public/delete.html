@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delete Account</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff0f0;
+      color: #900;
+    }
+    h1 {
+      color: #b30000;
+      text-align: center;
+    }
+    p.warning {
+      background-color: #ffd6d6;
+      border: 1px solid #ff4d4d;
+      padding: 15px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+    button {
+      background-color: #b30000;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    button:disabled {
+      background-color: #ff9999;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #800000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Delete Your Account</h1>
+
+  <p class="warning">
+    Warning: Deleting your account is <strong>permanent</strong> and cannot be undone.<br />
+    All your data, products, and information will be lost.
+  </p>
+
+  <form id="deleteAccountForm">
+    <label>
+      <input type="checkbox" id="confirmDelete" />
+      I understand the consequences and want to delete my account.
+    </label>
+
+    <button type="submit" disabled>Delete Account</button>
+  </form>
+
+  <script>
+    const checkbox = document.getElementById('confirmDelete');
+    const deleteBtn = document.querySelector('button[type="submit"]');
+    const form = document.getElementById('deleteAccountForm');
+
+    // Enable delete button only when checkbox is checked
+    checkbox.addEventListener('change', () => {
+      deleteBtn.disabled = !checkbox.checked;
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!checkbox.checked) return;
+
+      if (!confirm("Are you absolutely sure? This action cannot be undone.")) {
+        return;
+      }
+
+      try {
+        // Get logged-in user info from localStorage
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!user || !user._id) {
+          alert('You must be logged in to delete your account.');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Send DELETE request to backend
+        const response = await fetch(`http://10.146.16.7:4000/api/users/${user._id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            // If your API requires authentication token, include it here:
+            // 'Authorization': 'Bearer ' + user.token
+          },
+        });
+
+        if (!response.ok) {
+          // Try to parse JSON error message from server
+          let errorMsg = 'Failed to delete account';
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.error || errorMsg;
+          } catch {}
+
+          throw new Error(errorMsg);
+        }
+
+        alert('Your account has been deleted successfully.');
+
+        // Clear user session and redirect to home/login page
+        localStorage.removeItem('user');
+        window.location.href = 'index.html'; // or 'login.html'
+
+      } catch (error) {
+        alert('Error deleting account: ' + error.message);
+        console.error('Delete account error:', error);
+      }
+    });
+  </script>
+</body>
+</html>

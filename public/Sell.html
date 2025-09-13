@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sell Your Product</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+    h2 {
+      text-align: center;
+      color: #002f34;
+      margin-bottom: 20px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    textarea,
+    select {
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      resize: vertical;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    textarea {
+      min-height: 100px;
+    }
+    button {
+      padding: 14px;
+      background-color: #ffce32;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #e6b800;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #002f34;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive Mobile Styles */
+    @media (max-width: 480px) {
+      .container {
+        width: 90vw;
+        margin: 20px auto;
+        padding: 20px 15px;
+        min-height: 100vh;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      h2 {
+        font-size: 1.5rem;
+      }
+      input[type="text"],
+      input[type="number"],
+      input[type="file"],
+      textarea,
+      select,
+      button {
+        font-size: 18px;
+        padding: 14px;
+      }
+      button {
+        margin-top: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Sell Your Product</h2>
+    <form action="/api/products" method="POST" enctype="multipart/form-data">
+      <input type="text" name="title" placeholder="Product Name" required />
+
+      <textarea name="description" placeholder="Product Description" required></textarea>
+
+      <select name="condition" required>
+        <option value="" disabled selected>Choose Condition</option>
+        <option value="New">New</option>
+        <option value="Used">Used</option>
+        <option value="Refurbished">Refurbished</option>
+      </select>
+
+      <input type="text" name="location" placeholder="Location" required />
+
+      <input type="number" name="price" placeholder="Price (₹)" min="1" required />
+      
+      <input type="text" id="sellerPhone" name="sellerPhone" placeholder="Your WhatsApp Number (e.g. 919812345678)" required />
+
+      <input type="file" name="image" accept="image/*" required />
+
+      <button type="submit">Submit</button>
+    </form>
+    <a href="index.html" class="back-link">← Back to Home</a>
+  </div>
+
+  <script>
+    function fillPhoneFromLocalStorage() {
+      const userString = localStorage.getItem('user');
+      if (!userString) {
+        console.warn('No user data found in localStorage');
+        return;
+      }
+
+      try {
+        const user = JSON.parse(userString);
+        if (user.mobile) {
+          document.getElementById('sellerPhone').value = user.mobile;
+        } else {
+          console.warn('Mobile number not found in stored user data');
+        }
+      } catch (e) {
+        console.error('Error parsing user data from localStorage:', e);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', fillPhoneFromLocalStorage);
+  </script>
+</body>
+</html>

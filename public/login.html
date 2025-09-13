@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Login</title>
+  <style>
+    :root {
+      --primary: #2874f0;
+      --primary-dark: #0b57d0;
+      --background: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #333;
+      --error: #d32f2f;
+      --success: #388e3c;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-container {
+      background-color: var(--card-bg);
+      padding: 32px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
+      width: 100%;
+      max-width: 360px;
+      transition: 0.3s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      background-color: #fdfdfd;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .message {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @media (max-width: 400px) {
+      .login-container {
+        padding: 28px 20px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      button {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Welcome Back 👋</h2>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" required />
+
+      <button type="submit">Login</button>
+    </form>
+    <div class="message" id="messageBox"></div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      const messageBox = document.getElementById('messageBox');
+
+      try {
+        const res = await fetch('http://10.146.16.7:4000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          messageBox.style.color = 'var(--success)';
+          messageBox.textContent = 'Login successful! Redirecting...';
+
+          // Store in localStorage
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          // After successful login:
+localStorage.setItem("token", data.token);
+
+
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1500);
+        } else {
+          messageBox.style.color = 'var(--error)';
+          messageBox.textContent = data.message || 'Invalid email or password.';
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        messageBox.style.color = 'var(--error)';
+        messageBox.textContent = 'Something went wrong. Please try again.';
+      }
+    });
+  </script>
+
+</body>
+</html>

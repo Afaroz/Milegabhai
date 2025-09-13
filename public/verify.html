@@ -1,0 +1,79 @@
+<!-- Save as verify-otp.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verify OTP - Modern AI Style</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* your existing styles remain unchanged */
+  </style>
+</head>
+<body>
+  <div class="verify-container" role="main" aria-labelledby="verifyTitle">
+    <h2 id="verifyTitle">Verify Your OTP</h2>
+    <form id="verifyForm" autocomplete="off" novalidate>
+      <label for="otp">One-Time Password</label>
+      <input
+        type="text"
+        id="otp"
+        name="otp"
+        maxlength="6"
+        placeholder="Enter 6-digit OTP"
+        pattern="\d{6}"
+        required
+        inputmode="numeric"
+        aria-describedby="otpHelp"
+        aria-required="true"
+        autocomplete="off"
+      />
+      <div id="otpHelp" style="color:#61dafb; font-size: 0.85rem; margin-bottom: 15px;">
+        Check your email for the 6-digit code.
+      </div>
+      <button type="submit" aria-label="Verify and complete registration">Verify & Complete Registration</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const otpInput = document.getElementById('otp');
+      const otp = otpInput.value.trim();
+
+      if (!/^\d{6}$/.test(otp)) {
+        alert('Please enter a valid 6-digit OTP.');
+        otpInput.focus();
+        return;
+      }
+
+      const regData = JSON.parse(sessionStorage.getItem('regData'));
+      if (!regData || !regData.email) {
+        alert('Registration data missing. Please restart registration.');
+        window.location.href = '/register.html';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: regData.email, otp }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert('🎉 Registration successful!');
+          window.location.href = '/login.html';
+        } else {
+          alert('❌ Error: ' + (result.message || 'Invalid OTP.'));
+        }
+      } catch (error) {
+        console.error('Error verifying OTP:', error);
+        alert('⚠️ Internal Server Error. Please try again later.');
+      }
+    });
+  </script>
+</body>
+</html>

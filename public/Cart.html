@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart</title>
+  <style>
+    /* Add your styling here */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #002f34;
+      margin-bottom: 20px;
+    }
+    #cartContainer {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 15px;
+    }
+    .cart-item img {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 20px;
+    }
+    .item-info {
+      flex-grow: 1;
+    }
+    .item-info h3 {
+      margin: 0 0 10px 0;
+      color: #002f34;
+    }
+    .price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffce32;
+      margin: 5px 0;
+    }
+    .location {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    .actions button {
+      margin-right: 10px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .actions .delete {
+      background-color: #dc3545;
+      color: white;
+    }
+    .actions .buy {
+      background-color: #28a745;
+      color: white;
+    }
+    .empty {
+      color: #777;
+      font-size: 18px;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Your Cart</h1>
+  <div id="cartContainer">Loading cart...</div>
+
+  <script>
+    const container = document.getElementById('cartContainer');
+
+    let user = null;
+    try {
+      const userStr = localStorage.getItem('user');
+      user = userStr ? JSON.parse(userStr) : null;
+      console.log('Logged-in user:', user);
+    } catch (e) {
+      console.error('Failed to parse user from localStorage:', e);
+    }
+
+    // Normalize email helper
+    function normalizeEmail(email) {
+      return email.toLowerCase().trim();
+    }
+
+    if (!user || !user.email) {
+      container.innerHTML = '<p class="empty">Please log in to see your cart.</p>';
+    } else {
+      const normalizedEmail = normalizeEmail(user.email);
+
+      console.log('Fetching cart for email:', normalizedEmail);
+
+      async function loadCartFromServer() {
+        try {
+          const res = await fetch(
+            `http://10.146.16.7:4000/api/cart?email=${encodeURIComponent(normalizedEmail)}`
+          );
+          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+          const cart = await res.json();
+          console.log('Cart data received:', cart);
+          renderCart(cart);
+        } catch (err) {
+          console.error('Failed to fetch cart from server:', err);
+          container.innerHTML = `<p class="empty">Failed to load cart. Server unreachable or error occurred.</p>`;
+        }
+      }
+
+      function renderCart(cart) {
+        if (!Array.isArray(cart) || cart.length === 0) {
+          container.innerHTML = '<p class="empty">Your cart is empty.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        cart.forEach(item => {
+          const { product, quantity } = item;
+          if (!product) {
+            console.warn('Missing product data for cart item:', item);
+            return;
+          }
+          const imgSrc = product.image || 'https://via.placeholder.com/120x90?text=No+Image';
+          const productTitle = product.title || 'Untitled Product';
+          const price = Number(product.price) || 0;
+          const locationText = product.location || 'Unknown';
+
+          const html = `
+            <div class="cart-item" data-product-id="${product._id}">
+              <img src="${imgSrc}" alt="${productTitle}" />
+              <div class="item-info">
+                <h3>${productTitle}</h3>
+                <p class="price">₹${price.toLocaleString()}</p>
+                <p class="location">📍 ${locationText}</p>
+                <p>Quantity: ${quantity}</p>
+              </div>
+              <div class="actions">
+                <button class="delete">Delete</button>
+                <button class="buy">Buy Now</button>
+              </div>
+            </div>
+          `;
+          container.insertAdjacentHTML('beforeend', html);
+        });
+
+        container.querySelectorAll('.delete').forEach(btn => {
+          btn.addEventListener('click', e => {
+            const productId = e.target.closest('.cart-item').dataset.productId;
+            if (confirm('Are you sure you want to delete this item?')) deleteFromCart(productId);
+          });
+        });
+
+        container.querySelectorAll('.buy').forEach(btn => {
+          btn.addEventListener('click', e => {
+            const productId = e.target.closest('.cart-item').dataset.productId;
+            alert(`Proceed to buy product ID: ${productId}`);
+          });
+        });
+      }
+
+
+      
+
+
+
+
+      async function deleteFromCart(productId) {
+  try {
+    const url = `http://10.146.16.7:4000/api/cart?email=${encodeURIComponent(normalizedEmail)}&productId=${encodeURIComponent(productId)}`;
+    const res = await fetch(url, {
+      method: 'DELETE'
+    });
+    if (!res.ok) throw new Error(`Failed to delete item. Status: ${res.status}`);
+    alert('✅ Item deleted successfully!');
+    loadCartFromServer();
+  } catch (err) {
+    console.error('Error deleting item:', err);
+    alert('❌ Failed to delete item.');
+  }
+}
+
+
+
+
+
+      loadCartFromServer();
+    }
+  </script>
+</body>
+</html>
