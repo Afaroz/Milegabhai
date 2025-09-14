@@ -27,7 +27,7 @@ app.use('/uploads', express.static('uploads'));
 
 const PORT = process.env.PORT || 4000;
 
-const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/myappdb?retryWrites=true&w=majority';
 
 app.use(cors({
   origin: 'https://milegabhai.onrender.com',  // Replace with your local IP and port
@@ -61,10 +61,9 @@ const upload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 
 
 
 
-
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.log('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Login
 app.post('/login', async (req, res) => {
