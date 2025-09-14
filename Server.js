@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 4000;
 const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
 // Middleware
 app.use(cors({
-  origin: 'http://10.146.16.7:4000',  // Replace with your local IP and port
+  origin: 'https://milegabhai.onrender.com',  // Replace with your local IP and port
   methods: ['GET', 'POST'],
 }));
 
@@ -395,7 +395,7 @@ app.delete('/api/products/:id', async (req, res) => {
 
 app.listen(PORT, '0.0.0.0')
   .on('listening', () => {
-    console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+    console.log(`🚀 Server running at https://0.0.0.0:${PORT}`);
   })
   .on('error', (err) => {
     console.error('Server failed to start:', err);
