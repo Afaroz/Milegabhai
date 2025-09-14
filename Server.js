@@ -7,20 +7,11 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const Cart = require('./models/Cart');
-const Product = require('./models/Product');
+const Cart = require('./models/Cart'); // ✅ NOT '../models/Cart'
 require('dotenv').config();
+const Product = require('./models/Product');
 
-const app = express();
-const PORT = process.env.PORT || 4000;
-
-// MongoDB connection
-const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => console.log('❌ MongoDB connection error:', err));
-
-// User schema
+// Mongo models (user schema remains)
 const userSchema = new mongoose.Schema({
   fullname: String,
   email: { type: String, unique: true },
@@ -31,24 +22,27 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
 // Middleware
 app.use(cors({
-  origin: 'https://milegabhai.onrender.com',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: 'http://10.146.16.7:4000',  // Replace with your local IP and port
+  methods: ['GET', 'POST'],
 }));
+
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Static & Uploads
+// File uploads setup
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 app.use('/uploads', express.static(uploadDir));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Multer setup
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadDir),
   filename: (_req, file, cb) => {
@@ -61,18 +55,16 @@ const storage = multer.diskStorage({
 const imageFilter = (req, file, cb) =>
   file.mimetype.startsWith('image/') ? cb(null, true) : cb(new Error('Only images allowed!'), false);
 
-const upload = multer({
-  storage,
-  fileFilter: imageFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }
-});
+const upload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// ==== Routes ====
 
-// ✅ Favicon handler (to prevent 404)
-app.get('/favicon.ico', (_req, res) => res.status(204).end());
 
-// ✅ Login
+
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.log('MongoDB connection error:', err));
+
+// Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
@@ -86,13 +78,7 @@ app.post('/login', async (req, res) => {
 
     res.status(200).json({
       message: 'Login successful',
-      user: {
-        fullname: user.fullname,
-        email: user.email,
-        mobile: user.mobile,
-        location: user.location,
-        image: user.image
-      }
+      user: { fullname: user.fullname, email: user.email, mobile: user.mobile, location: user.location, image: user.image }
     });
   } catch (err) {
     console.error('❌ Login error:', err);
@@ -100,26 +86,17 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// ✅ Add Product
+
+// Product management
 app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { title, price, description, condition, location, sellerPhone } = req.body;
     const imageFile = req.file;
-
     if (!title || !price || !description || !condition || !location || !sellerPhone || !imageFile) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const product = new Product({
-      title,
-      price: Number(price),
-      description,
-      condition,
-      location,
-      sellerPhone,
-      image: `/uploads/${imageFile.filename}`
-    });
-
+    const product = new Product({ title, price: Number(price), description, condition, location, sellerPhone, image: `/uploads/${imageFile.filename}` });
     const saved = await product.save();
     res.status(201).json({ message: '✅ Product saved successfully', product: saved });
   } catch (error) {
@@ -128,7 +105,6 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
   }
 });
 
-// ✅ Get All or Filtered Products
 app.get('/api/products', async (req, res) => {
   try {
     const query = req.query.search;
@@ -141,7 +117,6 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// ✅ Get Product by ID
 app.get('/api/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -153,10 +128,11 @@ app.get('/api/products/:id', async (req, res) => {
   }
 });
 
-// ✅ Add to Cart
 app.post('/api/cart', async (req, res) => {
   try {
+    console.log('💬 Request Body:', req.body);
     const { userId, productId, quantity } = req.body;
+
     if (!userId || !productId) {
       return res.status(400).json({ message: 'Missing userId or productId' });
     }
@@ -167,43 +143,68 @@ app.post('/api/cart', async (req, res) => {
       quantity: quantity || 1
     });
 
-    const savedItem = await cartItem.save();
-    res.status(201).json({ message: '✅ Product added to cart successfully', cart: [savedItem] });
+    const savedItem = await cartItem.save(); // 💾 THIS saves to MongoDB
+
+    res.status(201).json({
+      message: '✅ Product added to cart successfully',
+      cart: [savedItem]
+    });
   } catch (err) {
     console.error('❌ Failed to save cart:', err);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
-// ✅ Get Cart
 app.get('/api/cart', async (req, res) => {
   const userEmail = req.query.email;
+
   if (!userEmail) {
     return res.status(400).json({ message: 'Email query parameter is required' });
   }
 
   try {
+    // Find all cart items belonging to this user
     const cartItems = await Cart.find({ userId: userEmail }).lean();
-    if (!cartItems.length) return res.json([]);
 
+    if (!cartItems.length) {
+      return res.json([]);  // Empty cart
+    }
+
+    // Fetch full product info for each cart item
     const detailedCart = await Promise.all(
       cartItems.map(async (item) => {
-        if (!mongoose.Types.ObjectId.isValid(item.productId)) return null;
+        if (!mongoose.Types.ObjectId.isValid(item.productId)) {
+          console.warn('Invalid productId:', item.productId);
+          return null;
+        }
+
         const product = await Product.findById(item.productId).lean();
-        return product ? { product, quantity: item.quantity } : null;
+        if (!product) {
+          console.warn('Product not found for ID:', item.productId);
+          return null;
+        }
+
+        return {
+          product,
+          quantity: item.quantity,
+        };
       })
     );
 
-    res.json(detailedCart.filter(item => item !== null));
+    // Remove any null results (invalid/missing products)
+    const filteredCart = detailedCart.filter(item => item !== null);
+
+    res.json(filteredCart);
+
   } catch (error) {
     console.error('Error fetching cart:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// ✅ Delete from Cart
 app.delete('/api/cart', async (req, res) => {
   const { email, productId } = req.query;
+
   if (!email || !productId) {
     return res.status(400).json({ message: 'Missing email or productId' });
   }
@@ -225,8 +226,9 @@ app.delete('/api/cart', async (req, res) => {
   }
 });
 
-// ✅ Upload Profile Image
-app.post('/api/uploadProfileImage', upload.single('profileImage'), async (req, res) => {
+// Profile image upload
+const profileUpload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
   try {
     const email = req.body.email;
     const file = req.file;
@@ -236,7 +238,6 @@ app.post('/api/uploadProfileImage', upload.single('profileImage'), async (req, r
 
     const imagePath = `/uploads/${file.filename}`;
     const updatedUser = await User.findOneAndUpdate({ email }, { image: imagePath }, { new: true });
-
     if (!updatedUser) return res.status(404).json({ success: false, message: 'User not found' });
 
     res.json({ success: true, message: 'Image uploaded', imageUrl: imagePath, user: updatedUser });
@@ -392,19 +393,10 @@ app.delete('/api/products/:id', async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-// ✅ Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
-
+app.listen(PORT, '0.0.0.0')
+  .on('listening', () => {
+    console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+  })
+  .on('error', (err) => {
+    console.error('Server failed to start:', err);
+  });
