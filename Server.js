@@ -22,8 +22,6 @@ const userSchema = new mongoose.Schema({
 });
 // Models
 const User = mongoose.model('User', userSchema); // Assuming userSchema is defined above or imported
-const Product = require('./models/Product'); // Make sure this path is correct
-
 const app = express();
 const PORT = process.env.PORT || 4000;
 
