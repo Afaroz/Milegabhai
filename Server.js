@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 const app = express();
+app.use('/uploads', express.static('uploads'));
+
 const PORT = process.env.PORT || 4000;
 
 const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
