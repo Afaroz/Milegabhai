@@ -20,24 +20,33 @@ const userSchema = new mongoose.Schema({
   password: String,
   image: String
 });
-const User = mongoose.model('User', userSchema);
+// Models
+const User = mongoose.model('User', userSchema); // Assuming userSchema is defined above or imported
+const Product = require('./models/Product'); // Make sure this path is correct
 
 const app = express();
-app.use('/uploads', express.static('uploads'));
-
 const PORT = process.env.PORT || 4000;
 
-const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/myappdb?retryWrites=true&w=majority';
+// ✅ Serve static files for uploaded images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use(cors({
-  origin: 'https://milegabhai.onrender.com',  // Replace with your local IP and port
-  methods: ['GET', 'POST'],
-}));
-
-
+// ✅ Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// ✅ CORS - Enable communication between frontend & backend
+app.use(cors({
+  origin: 'https://milegabhai.onrender.com',
+  methods: ['GET', 'POST'],
+  credentials: true // Only if you're using cookies/sessions
+}));
+
+// ✅ MongoDB Connection
+const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/myappdb?retryWrites=true&w=majority';
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // File uploads setup
 const uploadDir = path.join(__dirname, 'public/uploads');
@@ -61,9 +70,6 @@ const upload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 
 
 
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
 
 // Login
 app.post('/login', async (req, res) => {
@@ -106,11 +112,17 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
   }
 });
 
+
 app.get('/api/products', async (req, res) => {
   try {
     const query = req.query.search;
     const filter = query ? { title: { $regex: query, $options: 'i' } } : {};
+    console.log('🔍 Search query:', query || 'none');
+    console.log('📦 Filter used:', filter);
+
     const products = await Product.find(filter).sort({ createdAt: -1 });
+
+    console.log(`🧾 Found ${products.length} products`);
     res.json(products);
   } catch (error) {
     console.error('❌ Error fetching products:', error);
