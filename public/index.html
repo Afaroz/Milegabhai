@@ -240,16 +240,18 @@ header {
 
 let allProducts = [];
 
+const API_BASE_URL = 'https://milegabhai.onrender.com'; // Use your backend URL
+
 async function fetchProducts() {
   try {
-   const res = await fetch('https://milegabhai.onrender.com/api/products');
-
+    const res = await fetch(`${API_BASE_URL}/api/products`);
     allProducts = await res.json();
     displayProducts(allProducts);
   } catch (err) {
     console.error('Failed to fetch products', err);
   }
 }
+
 
 function displayProducts(products) {
   const container = document.getElementById('productsContainer');

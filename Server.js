@@ -26,7 +26,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/mydbname?retryWrites=true&w=majority';
-// Middleware
+
 app.use(cors({
   origin: 'https://milegabhai.onrender.com',  // Replace with your local IP and port
   methods: ['GET', 'POST'],
