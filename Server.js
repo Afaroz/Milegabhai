@@ -403,7 +403,6 @@ app.delete('/api/products/:id', async (req, res) => {
 
 
 
-
 app.listen(PORT, '0.0.0.0')
   .on('listening', () => {
     console.log(`🚀 Server running at https://0.0.0.0:${PORT}`);

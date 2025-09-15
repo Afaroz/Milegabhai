@@ -113,7 +113,7 @@
         try {
           const res = await fetch(`https://milegabhai.onrender.com/api/cart?email=${encodeURIComponent(normalizedEmail)}`
           );
-          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+          if (!res.ok) throw new Error(`HTTPS error! Status: ${res.status}`);
           const cart = await res.json();
           console.log('Cart data received:', cart);
           renderCart(cart);

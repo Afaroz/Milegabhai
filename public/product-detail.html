@@ -189,7 +189,7 @@
       .then(product => {
         currentProduct = product;
 
-        const imageUrl = product.image.startsWith('http')
+        const imageUrl = product.image.startsWith('https')
           ? product.image
           : SERVER_BASE_URL + product.image;
 
@@ -277,7 +277,7 @@
       }
 
       relatedGrid.innerHTML = products.map(p => {
-        const img = p.image.startsWith('http') ? p.image : SERVER_BASE_URL + p.image;
+        const img = p.image.startsWith('https') ? p.image : SERVER_BASE_URL + p.image;
         return `
           <div class="related-card" onclick="goToProduct('${p._id}')">
             <img src="${img}" alt="${p.title}">
