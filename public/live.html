@@ -10,19 +10,16 @@
       font-family: Arial, sans-serif;
       padding: 20px;
     }
-
     #controls {
       margin-bottom: 20px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
-
     input[type="text"], select {
       padding: 8px;
       font-size: 14px;
     }
-
     .btn-refresh {
       padding: 8px 12px;
       background-color: #2196F3;
@@ -31,17 +28,14 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     .btn-refresh:hover {
       background-color: #0b7dda;
     }
-
     #userProducts {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
-
     .product {
       display: flex;
       gap: 20px;
@@ -50,18 +44,15 @@
       border-radius: 8px;
       align-items: center;
     }
-
     .product img {
       width: 100px;
       height: 100px;
       object-fit: cover;
       border-radius: 4px;
     }
-
     .product-details {
       flex-grow: 1;
     }
-
     .btn-delete {
       background-color: #f44336;
       color: white;
@@ -70,21 +61,17 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     .btn-delete:hover {
       background-color: #d32f2f;
     }
-
     .no-products, .message {
       font-size: 16px;
       color: gray;
     }
-
     .message.success {
       color: green;
       margin-bottom: 10px;
     }
-
     #loadingSpinner {
       font-size: 24px;
       color: #999;
@@ -111,7 +98,9 @@
   </div>
 
   <script>
-    const API_BASE = "https://milegabhai.onrender.com/login";
+    // Set this to your backend API root (not the login page)
+    const API_BASE = "https://milegabhai.onrender.com";
+
     let allUserProducts = [];
 
     async function fetchUserProducts() {
@@ -135,10 +124,13 @@
       }
 
       try {
+        // Fetch all products from backend
         const response = await fetch(`${API_BASE}/api/products`);
         if (!response.ok) throw new Error('Failed to fetch products');
 
         const allProducts = await response.json();
+
+        // Filter products that belong to logged-in user
         allUserProducts = allProducts.filter(p =>
           p.sellerPhone === userMobile || p.phone === userMobile
         );
@@ -157,18 +149,29 @@
         return;
       }
 
-      container.innerHTML = products.map(p => `
-        <div class="product" data-id="${p._id}">
-          <img src="${API_BASE}${p.image || '/placeholder.jpg'}" alt="${p.title}" />
-          <div class="product-details">
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
-            <p><strong>Condition:</strong> ${p.condition}</p>
-            <p><strong>Price:</strong> ₹${p.price}</p>
+      container.innerHTML = products.map(p => {
+        // Handle image URL: if p.image is a filename, prepend /uploads/
+        let imgUrl = p.image;
+        if (imgUrl && !imgUrl.startsWith('http')) {
+          if (!imgUrl.startsWith('/')) imgUrl = '/' + imgUrl;
+          imgUrl = API_BASE + imgUrl;
+        } else if (!imgUrl) {
+          imgUrl = API_BASE + '/placeholder.jpg'; // fallback image
+        }
+
+        return `
+          <div class="product" data-id="${p._id}">
+            <img src="${imgUrl}" alt="${p.title}" />
+            <div class="product-details">
+              <h3>${p.title}</h3>
+              <p>${p.description}</p>
+              <p><strong>Condition:</strong> ${p.condition}</p>
+              <p><strong>Price:</strong> ₹${p.price}</p>
+            </div>
+            <button class="btn-delete" onclick="deleteProduct('${p._id}')">Delete</button>
           </div>
-          <button class="btn-delete" onclick="deleteProduct('${p._id}')">Delete</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function deleteProduct(id) {
