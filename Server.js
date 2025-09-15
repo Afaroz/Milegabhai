@@ -27,6 +27,8 @@ const PORT = process.env.PORT || 4000;
 
 // ✅ Serve static files for uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ✅ Serve static files (like .html, .css, .js) from the "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ✅ Middleware
 app.use(express.json({ limit: '10mb' }));
