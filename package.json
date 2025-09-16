@@ -23,6 +23,7 @@
     "https": "^1.0.0",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.6",
     "serve-favicon": "^2.5.1",
     "socket.io": "^4.8.1"
