@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 
 require('dotenv').config();
 
-const upload = multer({ storage: multer.memoryStorage() }); // store file in memory buffer
+
 
 const cloudinary = require('cloudinary').v2;
 
@@ -62,25 +62,19 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// File uploads setup
-const uploadDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-app.use('/uploads', express.static(uploadDir));
-app.use(express.static(path.join(__dirname, 'public')));
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, uniqueName);
-  }
+// Multer storage using Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: 'profile_images',
+  allowedFormats: ['jpg', 'jpeg', 'png'],
 });
 
-const imageFilter = (req, file, cb) =>
+// Image filter to accept images only
+const imageFilter = (req, file, cb) => 
   file.mimetype.startsWith('image/') ? cb(null, true) : cb(new Error('Only images allowed!'), false);
 
-const upload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+// Multer upload middleware using Cloudinary storage
+const profileUpload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }); { fileSize: 5 * 1024 * 1024 };
 
 
 
@@ -287,8 +281,7 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-// Create multer upload middleware
-const profileUpload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+
 
 app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
   try {
