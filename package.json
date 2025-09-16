@@ -13,6 +13,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
@@ -25,5 +26,13 @@
     "nodemailer": "^7.0.6",
     "serve-favicon": "^2.5.1",
     "socket.io": "^4.8.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Afaroz/Milegabhai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Afaroz/Milegabhai/issues"
+  },
+  "homepage": "https://github.com/Afaroz/Milegabhai#readme"
 }
