@@ -73,9 +73,6 @@ const storage = new CloudinaryStorage({
 const imageFilter = (req, file, cb) => 
   file.mimetype.startsWith('image/') ? cb(null, true) : cb(new Error('Only images allowed!'), false);
 
-// Multer upload middleware using Cloudinary storage
-const profileUpload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }); { fileSize: 5 * 1024 * 1024 };
-
 
 
 
