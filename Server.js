@@ -21,8 +21,7 @@ const userSchema = new mongoose.Schema({
   image: String
 });
 
-// Make sure these are at the top of your file:
-const cloudinary = require('cloudinary').v2;
+
 require('dotenv').config();
 
 
