@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema({
 require('dotenv').config();
 
 
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const cloudinary = require('cloudinary').v2;
 
