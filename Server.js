@@ -26,10 +26,13 @@ const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
 
-//Cloudinary Configuration
-CLOUDINARY_CLOUD_NAME=dlq5khrl3
-CLOUDINARY_API_KEY=741783867965388
-CLOUDINARY_API_SECRET=DMO_igCecyLUNIbKiYPWF1e8NSc
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Models
 const User = mongoose.model('User', userSchema); // Assuming userSchema is defined above or imported
