@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 
 require('dotenv').config();
 
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const upload = multer({ storage: multer.memoryStorage() }); // store file in memory buffer
 
 const cloudinary = require('cloudinary').v2;
 
@@ -33,8 +33,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-
 
 // Models
 const User = mongoose.model('User', userSchema); // Assuming userSchema is defined above or imported
