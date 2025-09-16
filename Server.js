@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema({
 
 // Make sure these are at the top of your file:
 const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
 require('dotenv').config();
 
 
