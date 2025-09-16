@@ -288,16 +288,7 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-
-app.post('/api/uploadProfileImage', (req, res, next) => {
-  profileUpload.single('profileImage')(req, res, (err) => {
-    if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ success: false, message: err.message });
-    }
-    next();
-  });
-}, async (req, res) => {
+app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
   try {
     const email = req.body.email;
     const file = req.file;
@@ -318,8 +309,8 @@ app.post('/api/uploadProfileImage', (req, res, next) => {
 
     res.json({ success: true, message: 'Image uploaded', imageUrl: imagePath, user: updatedUser });
   } catch (error) {
-    console.error('❌ Error uploading profile image:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error('❌ Error uploading profile image:', error.stack || error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 });
 
