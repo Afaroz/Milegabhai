@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 
 require('dotenv').config();
 
-
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -286,7 +286,8 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-
+// Create multer upload middleware
+const profileUpload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
   try {
