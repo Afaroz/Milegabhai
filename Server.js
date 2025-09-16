@@ -274,19 +274,47 @@ app.delete('/api/cart', async (req, res) => {
   }
 });
 
-// Profile image upload
-const profileUpload = multer({ storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } });
-app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.post('/api/uploadProfileImage', (req, res, next) => {
+  profileUpload.single('profileImage')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     const email = req.body.email;
     const file = req.file;
+
+    console.log('Email:', email);
+    console.log('File:', file);
+
     if (!email || !file) {
       return res.status(400).json({ success: false, message: 'Email and image file are required' });
     }
 
-    const imagePath = `/uploads/${file.filename}`;
+    const imagePath = file.path;
+
     const updatedUser = await User.findOneAndUpdate({ email }, { image: imagePath }, { new: true });
-    if (!updatedUser) return res.status(404).json({ success: false, message: 'User not found' });
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
 
     res.json({ success: true, message: 'Image uploaded', imageUrl: imagePath, user: updatedUser });
   } catch (error) {
@@ -294,6 +322,17 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 
