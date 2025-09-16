@@ -20,18 +20,6 @@ const userSchema = new mongoose.Schema({
   password: String,
   image: String
 });
-
-// Make sure these are at the top of your file:
-const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
-require('dotenv').config();
-
-
-// Cloudinary Configuration
-CLOUDINARY_CLOUD_NAME=dlq5khrl3
-CLOUDINARY_API_KEY=741783867965388
-CLOUDINARY_API_SECRET=DMO_igCecyLUNIbKiYPWF1e8NSc
-
 // Models
 const User = mongoose.model('User', userSchema); // Assuming userSchema is defined above or imported
 const app = express();
@@ -106,45 +94,23 @@ app.post('/login', async (req, res) => {
 });
 
 
-
-// Product management route with Cloudinary upload
+// Product management
 app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { title, price, description, condition, location, sellerPhone } = req.body;
     const imageFile = req.file;
-
     if (!title || !price || !description || !condition || !location || !sellerPhone || !imageFile) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // 🔼 Upload image to Cloudinary
-    const result = await cloudinary.uploader.upload(imageFile.path, {
-      folder: 'products' // optional folder in Cloudinary
-    });
-
-    // 🔄 Delete local image file after upload (optional)
-    fs.unlinkSync(imageFile.path);
-
-    // 💾 Save product with Cloudinary image URL
-    const product = new Product({
-      title,
-      price: Number(price),
-      description,
-      condition,
-      location,
-      sellerPhone,
-      image: result.secure_url  // ✅ This is the Cloudinary image URL
-    });
-
+    const product = new Product({ title, price: Number(price), description, condition, location, sellerPhone, image: `/uploads/${imageFile.filename}` });
     const saved = await product.save();
     res.status(201).json({ message: '✅ Product saved successfully', product: saved });
-
   } catch (error) {
     console.error('❌ Error saving product:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 
 app.get('/api/products', async (req, res) => {
