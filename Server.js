@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 
 require('dotenv').config();
 
-const upload = multer({ storage });
+
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const cloudinary = require('cloudinary').v2;
@@ -74,7 +74,7 @@ const storage = new CloudinaryStorage({
 const imageFilter = (req, file, cb) => 
   file.mimetype.startsWith('image/') ? cb(null, true) : cb(new Error('Only images allowed!'), false);
 
-
+const upload = multer({ storage });
 
 
 // Login
