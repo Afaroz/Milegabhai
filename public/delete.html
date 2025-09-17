@@ -84,57 +84,55 @@
       deleteBtn.disabled = !checkbox.checked;
     });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      if (!checkbox.checked) return;
+  if (!checkbox.checked) return;
 
-      if (!confirm("Are you absolutely sure? This action cannot be undone.")) {
-        return;
-      }
+  if (!confirm("Are you absolutely sure? This action cannot be undone.")) {
+    return;
+  }
 
-      try {
-        // Get logged-in user info from localStorage
-        const user = JSON.parse(localStorage.getItem('user'));
+  try {
+    // Get logged-in user info from localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
 
-        if (!user || !user._id) {
-          alert('You must be logged in to delete your account.');
-          window.location.href = 'login.html';
-          return;
-        }
+    if (!user || !user.email) {
+      alert('You must be logged in to delete your account.');
+      window.location.href = 'login.html';
+      return;
+    }
 
-        // Send DELETE request to backend
-        const response = await fetch(`https://milegabhai.onrender.com/api/users/${user._id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            // If your API requires authentication token, include it here:
-            // 'Authorization': 'Bearer ' + user.token
-          },
-        });
-
-        if (!response.ok) {
-          // Try to parse JSON error message from server
-          let errorMsg = 'Failed to delete account';
-          try {
-            const errorData = await response.json();
-            errorMsg = errorData.error || errorMsg;
-          } catch {}
-
-          throw new Error(errorMsg);
-        }
-
-        alert('Your account has been deleted successfully.');
-
-        // Clear user session and redirect to home/login page
-        localStorage.removeItem('user');
-        window.location.href = 'index.html'; // or 'login.html'
-
-      } catch (error) {
-        alert('Error deleting account: ' + error.message);
-        console.error('Delete account error:', error);
-      }
+    // Send DELETE request to backend using email instead of _id
+    const response = await fetch(`https://milegabhai.onrender.com/api/users/deleteByEmail`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: user.email })
     });
-  </script>
+
+    if (!response.ok) {
+      let errorMsg = 'Failed to delete account';
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.error || errorMsg;
+      } catch {}
+
+      throw new Error(errorMsg);
+    }
+
+    alert('Your account has been deleted successfully.');
+
+    // Clear user session and redirect to home/login page
+    localStorage.removeItem('user');
+    window.location.href = 'index.html'; // or 'login.html'
+
+  } catch (error) {
+    alert('Error deleting account: ' + error.message);
+    console.error('Delete account error:', error);
+  }
+});
+</script>
 </body>
 </html>
