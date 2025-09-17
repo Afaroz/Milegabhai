@@ -23,10 +23,7 @@ const userSchema = new mongoose.Schema({
 
 
 require('dotenv').config();
-
-
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-
 const cloudinary = require('cloudinary').v2;
 
 cloudinary.config({
@@ -40,8 +37,6 @@ const User = mongoose.model('User', userSchema); // Assuming userSchema is defin
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// ✅ Serve static files for uploaded images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ✅ Serve static files (like .html, .css, .js) from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 
