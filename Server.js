@@ -76,6 +76,27 @@ const imageFilter = (req, file, cb) =>
 
 const profileUpload = multer({ storage });
 
+// Define storage for products
+const productStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'product_images',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+    public_id: (req, file) => 'product_' + Date.now(),
+  },
+});
+
+// Create multer upload instance for products
+const upload = multer({ storage: productStorage });
+const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'profile_images',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
+    public_id: (req, file) => 'profile_' + Date.now(),
+  },
+});
+
 
 // Login
 app.post('/login', async (req, res) => {
