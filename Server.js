@@ -494,11 +494,47 @@ app.delete('/api/users/deleteByEmail', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    const deletedUser = await User.findOneAndDelete({ email });
-    if (!deletedUser) return res.status(404).json({ error: 'User not found' });
+    // Find the user
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-    res.json({ message: 'User deleted successfully' });
+    // Delete user image from Cloudinary (if exists)
+    if (user.image) {
+      // Extract public_id from the image URL
+      // Assuming user.image contains Cloudinary URL like:
+      // https://res.cloudinary.com/<cloud_name>/image/upload/v1234567890/folder/public_id.ext
+      const imageUrl = user.image;
+      const publicIdMatch = imageUrl.match(/\/([^\/]+)\.(jpg|png|jpeg|gif|webp)$/i);
+      let publicId;
+
+      if (publicIdMatch) {
+        // Extract file name without extension for public_id
+        publicId = publicIdMatch[1];
+      } else {
+        // If URL structure is different, you might want to parse differently
+        // or store public_id separately in user document
+        publicId = null;
+      }
+
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+          console.log(`Deleted Cloudinary image with public_id: ${publicId}`);
+        } catch (cloudErr) {
+          console.error('Cloudinary delete error:', cloudErr);
+        }
+      }
+    }
+
+    // Delete all products related to user by email or user._id (depending on your schema)
+    await Product.deleteMany({ userEmail: email }); // Adjust field as per your schema
+
+    // Finally, delete the user
+    await User.deleteOne({ email });
+
+    res.json({ message: 'User, products, and image deleted successfully' });
   } catch (error) {
+    console.error('Delete error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
