@@ -493,71 +493,53 @@ app.delete('/api/users/deleteByEmail', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    // Find the user
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Delete user image from Cloudinary (if exists)
+    // Delete user image from Cloudinary
     if (user.image) {
-      const imageUrl = user.image;
-      const publicIdMatch = imageUrl.match(/\/([^\/]+)\.(jpg|png|jpeg|gif|webp)$/i);
-      let publicId;
-
-      if (publicIdMatch) {
-        publicId = publicIdMatch[1];
-      } else {
-        publicId = null;
-      }
+      const match = user.image.match(/\/upload\/(?:v\d+\/)?(.+)\.(jpg|png|jpeg|gif|webp)$/i);
+      const publicId = match ? match[1] : null;
 
       if (publicId) {
         try {
           await cloudinary.uploader.destroy(publicId);
-          console.log(`Deleted Cloudinary user image with public_id: ${publicId}`);
-        } catch (cloudErr) {
-          console.error('Cloudinary delete error for user image:', cloudErr);
+          console.log(`Deleted user image: ${publicId}`);
+        } catch (err) {
+          console.error('Error deleting user image:', err);
         }
       }
     }
 
-    // Fetch products by user's mobile number
-    const userMobile = user.mobile;  // Assuming user has a 'mobile' field
-    if (!userMobile) {
-      console.warn('User does not have a mobile number');
-    } else {
-      const products = await Product.find({ mobile: userMobile });
+    // Delete user's products and their images
+    const userMobile = user.mobile;
+    if (userMobile) {
+      const products = await Product.find({ sellerPhone: userMobile }); // Match correct field!
 
-      // Delete each product image from Cloudinary
       for (const product of products) {
-        if (product.image) {  // Assuming product.image stores Cloudinary URL
-          const prodImageUrl = product.image;
-          const prodPublicIdMatch = prodImageUrl.match(/\/([^\/]+)\.(jpg|png|jpeg|gif|webp)$/i);
-          let prodPublicId;
+        if (product.image) {
+          const match = product.image.match(/\/upload\/(?:v\d+\/)?(.+)\.(jpg|png|jpeg|gif|webp)$/i);
+          const publicId = match ? match[1] : null;
 
-          if (prodPublicIdMatch) {
-            prodPublicId = prodPublicIdMatch[1];
-          } else {
-            prodPublicId = null;
-          }
-
-          if (prodPublicId) {
+          if (publicId) {
             try {
-              await cloudinary.uploader.destroy(prodPublicId);
-              console.log(`Deleted Cloudinary product image with public_id: ${prodPublicId}`);
-            } catch (prodCloudErr) {
-              console.error('Cloudinary delete error for product image:', prodCloudErr);
+              await cloudinary.uploader.destroy(publicId);
+              console.log(`Deleted product image: ${publicId}`);
+            } catch (err) {
+              console.error('Error deleting product image:', err);
             }
           }
         }
       }
 
-      // Delete all products by mobile number
-      await Product.deleteMany({ mobile: userMobile });
+      // Delete all products by seller phone
+      await Product.deleteMany({ sellerPhone: userMobile });
     }
 
-    // Finally, delete the user
+    // Delete user
     await User.deleteOne({ email });
 
-    res.json({ message: 'User, products, and images deleted successfully' });
+    res.json({ message: '✅ User, products, and images deleted successfully' });
   } catch (error) {
     console.error('Delete error:', error);
     res.status(500).json({ error: 'Server error' });
