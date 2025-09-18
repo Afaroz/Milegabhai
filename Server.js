@@ -500,39 +500,65 @@ app.delete('/api/users/deleteByEmail', async (req, res) => {
 
     // Delete user image from Cloudinary (if exists)
     if (user.image) {
-      // Extract public_id from the image URL
-      // Assuming user.image contains Cloudinary URL like:
-      // https://res.cloudinary.com/<cloud_name>/image/upload/v1234567890/folder/public_id.ext
       const imageUrl = user.image;
       const publicIdMatch = imageUrl.match(/\/([^\/]+)\.(jpg|png|jpeg|gif|webp)$/i);
       let publicId;
 
       if (publicIdMatch) {
-        // Extract file name without extension for public_id
         publicId = publicIdMatch[1];
       } else {
-        // If URL structure is different, you might want to parse differently
-        // or store public_id separately in user document
         publicId = null;
       }
 
       if (publicId) {
         try {
           await cloudinary.uploader.destroy(publicId);
-          console.log(`Deleted Cloudinary image with public_id: ${publicId}`);
+          console.log(`Deleted Cloudinary user image with public_id: ${publicId}`);
         } catch (cloudErr) {
-          console.error('Cloudinary delete error:', cloudErr);
+          console.error('Cloudinary delete error for user image:', cloudErr);
         }
       }
     }
 
-    // Delete all products related to user by email or user._id (depending on your schema)
-    await Product.deleteMany({ userEmail: email }); // Adjust field as per your schema
+    // Fetch products by user's mobile number
+    const userMobile = user.mobile;  // Assuming user has a 'mobile' field
+    if (!userMobile) {
+      console.warn('User does not have a mobile number');
+    } else {
+      const products = await Product.find({ mobile: userMobile });
+
+      // Delete each product image from Cloudinary
+      for (const product of products) {
+        if (product.image) {  // Assuming product.image stores Cloudinary URL
+          const prodImageUrl = product.image;
+          const prodPublicIdMatch = prodImageUrl.match(/\/([^\/]+)\.(jpg|png|jpeg|gif|webp)$/i);
+          let prodPublicId;
+
+          if (prodPublicIdMatch) {
+            prodPublicId = prodPublicIdMatch[1];
+          } else {
+            prodPublicId = null;
+          }
+
+          if (prodPublicId) {
+            try {
+              await cloudinary.uploader.destroy(prodPublicId);
+              console.log(`Deleted Cloudinary product image with public_id: ${prodPublicId}`);
+            } catch (prodCloudErr) {
+              console.error('Cloudinary delete error for product image:', prodCloudErr);
+            }
+          }
+        }
+      }
+
+      // Delete all products by mobile number
+      await Product.deleteMany({ mobile: userMobile });
+    }
 
     // Finally, delete the user
     await User.deleteOne({ email });
 
-    res.json({ message: 'User, products, and image deleted successfully' });
+    res.json({ message: 'User, products, and images deleted successfully' });
   } catch (error) {
     console.error('Delete error:', error);
     res.status(500).json({ error: 'Server error' });
