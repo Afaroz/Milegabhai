@@ -58,7 +58,12 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-
+// Multer storage using Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: 'profile_images',
+  allowedFormats: ['jpg', 'jpeg', 'png'],
+});
 
 // Image filter to accept images only
 const imageFilter = (req, file, cb) => 
