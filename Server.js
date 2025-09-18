@@ -124,11 +124,6 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Upload image to Cloudinary
-    const result = await cloudinary.uploader.upload(imageFile.path, {
-      folder: 'products'
-    });
-
     // Delete local image file only if it's a local path, not a URL
     if (imageFile.path && !imageFile.path.startsWith('http')) {
       fs.unlinkSync(imageFile.path);
