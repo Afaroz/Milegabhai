@@ -118,12 +118,21 @@ app.post('/login', async (req, res) => {
 app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { title, price, description, condition, location, sellerPhone } = req.body;
+    const imageFile = req.file;
 
-    if (!title || !price || !description || !condition || !location || !sellerPhone) {
+    if (!title || !price || !description || !condition || !location || !sellerPhone || !imageFile) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload(imageFile.path, {
+      folder: 'products'
+    });
 
+    // Delete local image file only if it's a local path, not a URL
+    if (imageFile.path && !imageFile.path.startsWith('http')) {
+      fs.unlinkSync(imageFile.path);
+    }
 
     // Save product info with Cloudinary image URL
     const product = new Product({
@@ -133,6 +142,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       condition,
       location,
       sellerPhone,
+      image: result.secure_url
     });
 
     const saved = await product.save();
