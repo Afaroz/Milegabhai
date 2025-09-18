@@ -115,9 +115,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
-
-// Product management route with Cloudinary upload
 app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { title, price, description, condition, location, sellerPhone } = req.body;
@@ -127,15 +124,17 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // 🔼 Upload image to Cloudinary
+    // Upload image to Cloudinary
     const result = await cloudinary.uploader.upload(imageFile.path, {
-      folder: 'products' // optional folder in Cloudinary
+      folder: 'products'
     });
 
-    // 🔄 Delete local image file after upload (optional)
-    fs.unlinkSync(imageFile.path);
+    // Delete local image file only if it's a local path, not a URL
+    if (imageFile.path && !imageFile.path.startsWith('http')) {
+      fs.unlinkSync(imageFile.path);
+    }
 
-    // 💾 Save product with Cloudinary image URL
+    // Save product info with Cloudinary image URL
     const product = new Product({
       title,
       price: Number(price),
@@ -143,14 +142,14 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       condition,
       location,
       sellerPhone,
-      image: result.secure_url  // ✅ This is the Cloudinary image URL
+      image: result.secure_url
     });
 
     const saved = await product.save();
-    res.status(201).json({ message: '✅ Product saved successfully', product: saved });
+    res.status(201).json({ message: 'Product saved successfully', product: saved });
 
   } catch (error) {
-    console.error('❌ Error saving product:', error);
+    console.error('Error saving product:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
