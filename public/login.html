@@ -3,73 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Login</title>
+  <title>Login - OLX Clone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --primary: #2874f0;
       --primary-dark: #0b57d0;
-      --background: #f4f6f8;
-      --card-bg: #ffffff;
+      --bg: #f3f6fb;
+      --card-bg: #fff;
       --text: #333;
       --error: #d32f2f;
       --success: #388e3c;
-      --shadow: rgba(0, 0, 0, 0.08);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--background);
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      height: 100vh;
     }
 
     .login-container {
-      background-color: var(--card-bg);
-      padding: 32px 24px;
+      background: var(--card-bg);
+      padding: 40px 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px var(--shadow);
+      box-shadow: var(--shadow);
+      max-width: 380px;
       width: 100%;
-      max-width: 360px;
-      transition: 0.3s ease-in-out;
+      animation: fadeIn 0.6s ease;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 24px;
-      color: var(--text);
+      margin-bottom: 28px;
+      color: var(--primary);
+      font-size: 24px;
     }
 
     label {
       font-weight: 600;
       font-size: 14px;
+      color: var(--text);
       display: block;
       margin-bottom: 6px;
-      color: #444;
     }
 
     input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 18px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 15px;
-      background-color: #fdfdfd;
       transition: border-color 0.2s ease;
+      background-color: #fdfdfd;
     }
 
     input:focus {
-      outline: none;
       border-color: var(--primary);
+      outline: none;
     }
 
     button {
@@ -90,22 +91,45 @@
     }
 
     .message {
-      margin-top: 16px;
-      text-align: center;
+      margin-top: 18px;
       font-size: 14px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .message.success {
+      color: var(--success);
+    }
+
+    .message.error {
+      color: var(--error);
+    }
+
+    .spinner {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @media (max-width: 400px) {
       .login-container {
-        padding: 28px 20px;
+        padding: 30px 20px;
       }
 
       h2 {
         font-size: 22px;
-      }
-
-      button {
-        font-size: 15px;
       }
     }
   </style>
@@ -114,7 +138,7 @@
 
   <div class="login-container">
     <h2>Welcome Back 👋</h2>
-    <form id="loginForm">
+    <form id="loginForm" novalidate>
       <label for="email">Email</label>
       <input type="email" id="email" name="email" placeholder="you@example.com" required />
 
@@ -123,20 +147,26 @@
 
       <button type="submit">Login</button>
     </form>
+
+    <div class="spinner" id="spinner" style="display: none;">Processing...</div>
     <div class="message" id="messageBox"></div>
   </div>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    const loginForm = document.getElementById('loginForm');
+    const messageBox = document.getElementById('messageBox');
+    const spinner = document.getElementById('spinner');
+
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
-      const messageBox = document.getElementById('messageBox');
+      messageBox.textContent = '';
+      spinner.style.display = 'block';
 
       try {
-        // Use HTTPS endpoint instead of HTTP
         const res = await fetch('https://milegabhai.onrender.com/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -144,27 +174,27 @@
         });
 
         const data = await res.json();
+        spinner.style.display = 'none';
 
         if (res.ok) {
-          messageBox.style.color = 'var(--success)';
-          messageBox.textContent = 'Login successful! Redirecting...';
+          messageBox.className = 'message success';
+          messageBox.textContent = '✅ Login successful! Redirecting...';
 
-          // Store user data in localStorage
+          // Save user to localStorage
           localStorage.setItem('user', JSON.stringify(data.user));
 
-          
-
           setTimeout(() => {
-            window.location.href = 'index.html';  // Redirect to homepage
+            window.location.href = 'index.html';
           }, 1500);
         } else {
-          messageBox.style.color = 'var(--error)';
+          messageBox.className = 'message error';
           messageBox.textContent = data.message || 'Invalid email or password.';
         }
       } catch (err) {
+        spinner.style.display = 'none';
+        messageBox.className = 'message error';
+        messageBox.textContent = '⚠️ Something went wrong. Please try again.';
         console.error('Login error:', err);
-        messageBox.style.color = 'var(--error)';
-        messageBox.textContent = 'Something went wrong. Please try again.';
       }
     });
   </script>
