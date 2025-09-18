@@ -124,6 +124,11 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload(imageFile.path, {
+      folder: 'products'
+    });
+
     // Delete local image file only if it's a local path, not a URL
     if (imageFile.path && !imageFile.path.startsWith('http')) {
       fs.unlinkSync(imageFile.path);
@@ -291,45 +296,7 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-// ✅ Upload Profile Image API Route
-app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
-  try {
-    const email = req.body.email;
-    const file = req.file;
-
-    console.log('Email:', email);
-    console.log('File:', file);
-
-    if (!email || !file) {
-      return res.status(400).json({ success: false, message: 'Email and image file are required' });
-    }
-
-    const imageUrl = file.path; // This is the Cloudinary URL
-
-    const updatedUser = await User.findOneAndUpdate(
-      { email },
-      { image: imageUrl },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    res.json({
-      success: true,
-      message: 'Image uploaded to Cloudinary',
-      imageUrl: imageUrl,
-      user: updatedUser,
-    });
-  } catch (error) {
-    console.error('❌ Error uploading profile image:', error.stack || error);
-    res.status(500).json({
-      success: false,
-      message: error.message || 'Server error',
-    });
-  }
-});
+// 
 
 
 
