@@ -452,24 +452,49 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
-// DELETE route
+
+
+// DELETE product and Cloudinary image
 app.delete('/api/products/:id', async (req, res) => {
   const id = req.params.id;
 
-  console.log("DELETE request received for ID:", id);
+  console.log("🗑️ DELETE request received for ID:", id);
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: 'Invalid product ID' });
   }
 
   try {
-    const result = await Product.findByIdAndDelete(id);
-    if (!result) {
+    // 1️⃣ Find the product by ID
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json({ message: 'Product deleted successfully' });
+
+    // 2️⃣ Delete image from Cloudinary
+    if (product.image) {
+      // Extract public_id from Cloudinary URL
+      const match = product.image.match(/\/upload\/(?:v\d+\/)?(.+)\.(jpg|jpeg|png|webp|gif)$/i);
+      const publicId = match && match[1] ? match[1] : null;
+
+      if (publicId) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+          console.log('✅ Cloudinary image deleted:', publicId);
+        } catch (cloudErr) {
+          console.error('⚠️ Cloudinary image delete error:', cloudErr.message);
+        }
+      } else {
+        console.warn('⚠️ Could not extract public_id from image URL:', product.image);
+      }
+    }
+
+    // 3️⃣ Delete the product from MongoDB
+    await Product.findByIdAndDelete(id);
+
+    res.json({ message: '✅ Product and image deleted successfully' });
   } catch (err) {
-    console.error('Error deleting product:', err);
+    console.error('❌ Error deleting product:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
