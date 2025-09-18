@@ -3,11 +3,116 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Verify OTP - Modern AI Style</title>
+  <title>Verify OTP - Secure Your Account</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    /* your existing styles remain unchanged */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    .verify-container {
+      background-color: #1c1e26;
+      padding: 40px 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      color: #61dafb;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #ccc;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      font-size: 16px;
+      background-color: #2a2d35;
+      color: #fff;
+      outline: none;
+      transition: border 0.3s ease;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"]:focus {
+      border-color: #61dafb;
+    }
+
+    #otpHelp {
+      color: #bbb;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #61dafb;
+      color: #0f2027;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background-color: #4fb2d6;
+      transform: scale(1.02);
+    }
+
+    button:focus {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 480px) {
+      .verify-container {
+        padding: 30px 20px;
+      }
+      h2 {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -28,10 +133,10 @@
         aria-required="true"
         autocomplete="off"
       />
-      <div id="otpHelp" style="color:#61dafb; font-size: 0.85rem; margin-bottom: 15px;">
-        Check your email for the 6-digit code.
+      <div id="otpHelp">
+        📩 Check your email inbox for a 6-digit OTP code.
       </div>
-      <button type="submit" aria-label="Verify and complete registration">Verify & Complete Registration</button>
+      <button type="submit" aria-label="Verify and complete registration">✅ Verify & Complete</button>
     </form>
   </div>
 
@@ -42,14 +147,14 @@
       const otp = otpInput.value.trim();
 
       if (!/^\d{6}$/.test(otp)) {
-        alert('Please enter a valid 6-digit OTP.');
+        alert('⚠️ Please enter a valid 6-digit OTP.');
         otpInput.focus();
         return;
       }
 
       const regData = JSON.parse(sessionStorage.getItem('regData'));
       if (!regData || !regData.email) {
-        alert('Registration data missing. Please restart registration.');
+        alert('🔁 Registration session expired. Please register again.');
         window.location.href = '/register.html';
         return;
       }
@@ -64,14 +169,14 @@
         const result = await response.json();
 
         if (response.ok) {
-          alert('🎉 Registration successful!');
+          alert('🎉 OTP verified! Registration complete.');
           window.location.href = '/login.html';
         } else {
-          alert('❌ Error: ' + (result.message || 'Invalid OTP.'));
+          alert('❌ Verification failed: ' + (result.message || 'Invalid OTP.'));
         }
       } catch (error) {
-        console.error('Error verifying OTP:', error);
-        alert('⚠️ Internal Server Error. Please try again later.');
+        console.error('OTP verification error:', error);
+        alert('🚨 Server error. Please try again later.');
       }
     });
   </script>
