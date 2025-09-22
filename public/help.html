@@ -69,53 +69,23 @@
       line-height: 1.5;
     }
 
-    /* Contact form */
-    form {
+    /* Contact info box */
+    .contact-info {
       margin-top: 40px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-    }
-
-    input[type="text"], input[type="email"], textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    button[type="submit"] {
-      background: #007bff;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      font-weight: 700;
-      cursor: pointer;
-      border-radius: 5px;
+      padding: 20px;
+      background: #f1f9ff;
+      border-radius: 8px;
+      border: 1px solid #cce5ff;
       font-size: 16px;
-      transition: background-color 0.3s ease;
     }
 
-    button[type="submit"]:hover {
-      background: #0056b3;
+    .contact-info a {
+      color: #007bff;
+      text-decoration: none;
     }
 
-    /* Success message */
-    #successMessage {
-      margin-top: 15px;
-      color: green;
-      font-weight: 700;
+    .contact-info a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -130,41 +100,32 @@
     <div id="faqList">
       <div class="faq-item">
         <div class="faq-question">How do I reset my password?</div>
-        <div class="faq-answer">The password reset functionality is not added into this website if still you wanted to update your password you can sent us the email or delete your current account and make the new account Thank You.</div>
+        <div class="faq-answer">The password reset functionality is not added into this website. If you still want to update your password, you can send us an email or delete your current account and create a new account. Thank you.</div>
       </div>
       <div class="faq-item">
         <div class="faq-question">How can I contact customer support?</div>
-        <div class="faq-answer">You can contact customer support by filling out the form below or emailing shaikhafaroz76@gmail.com.</div>
+        <div class="faq-answer">You can contact customer support via the email and WhatsApp details below.</div>
       </div>
       <div class="faq-item">
         <div class="faq-question">Where can I find my sell history?</div>
-        <div class="faq-answer">If you wanted to check your sell history click on the Live profucts button after click on this button your all the history will appear.</div>
+        <div class="faq-answer">To check your sell history, click on the Live Products button. Your complete history will appear there.</div>
       </div>
       <div class="faq-item">
         <div class="faq-question">How do I update my account information?</div>
         <div class="faq-answer">You can update your account information from the Settings page after logging in.</div>
       </div>
-         <div class="faq-item">
+      <div class="faq-item">
         <div class="faq-question">How do I delete the product?</div>
-        <div class="faq-answer">You can go to the Live product option you will see the delete button click on this button your product will be deleted.</div>
+        <div class="faq-answer">Go to the Live Products option. You will see a delete button. Click it to delete your product.</div>
       </div>
     </div>
 
-    <!-- Contact Form -->
-    <form id="contactForm">
+    <!-- Contact info -->
+    <div class="contact-info">
       <h2>Contact Support</h2>
-      <label for="name">Name</label>
-      <input type="text" id="name" required />
-
-      <label for="email">Email</label>
-      <input type="email" id="email" required />
-
-      <label for="message">Message</label>
-      <textarea id="message" required></textarea>
-
-      <button type="submit">Send Message</button>
-      <div id="successMessage"></div>
-    </form>
+      <p><strong>Email:</strong> <a href="mailto:shaikhafaroz841@gmail.com">shaikhafaroz76@gmail.com</a></p>
+      <p><strong>WhatsApp:</strong> <a href="https://wa.me/917387304707" target="_blank">+91 98123 45678</a></p>
+    </div>
   </div>
 
   <script>
@@ -199,19 +160,6 @@
           item.style.display = 'none';
         }
       });
-    });
-
-    // Contact form submit handler
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      // Simple front-end validation done by 'required' attributes already
-
-      // Normally here you would send data to your backend server.
-      // For this demo, just show success message and reset form.
-
-      document.getElementById('successMessage').textContent = 'Thank you for contacting support! We will get back to you soon.';
-      e.target.reset();
     });
   </script>
 </body>
