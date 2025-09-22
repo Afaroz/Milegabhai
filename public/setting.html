@@ -6,51 +6,82 @@
   <title>Account Settings</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 500px;
       margin: 50px auto;
       padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       text-align: center;
-      background-color: #f9f9f9;
     }
+
     h1 {
       margin-bottom: 30px;
       color: #333;
+      font-size: 24px;
     }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
     .btn {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      margin: 15px 0;
-      font-size: 18px;
+      padding: 14px 20px;
+      font-size: 16px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
       color: white;
       text-decoration: none;
+      transition: background-color 0.3s ease;
     }
+
     .btn-update {
       background-color: #007bff;
     }
+
     .btn-update:hover {
       background-color: #0056b3;
     }
+
     .btn-delete {
       background-color: #dc3545;
     }
+
     .btn-delete:hover {
       background-color: #a71d2a;
+    }
+
+    /* Desktop view: side-by-side buttons */
+    @media (min-width: 600px) {
+      .button-group {
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .btn {
+        flex: 1;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Account Settings</h1>
+  <div class="container">
+    <h1>Account Settings</h1>
 
-  <a href="update.html" class="btn btn-update">Update Account</a>
-  <a href="delete.html" class="btn btn-delete">Delete Account</a>
-
+    <div class="button-group">
+      <a href="update.html" class="btn btn-update">Update Account</a>
+      <a href="delete.html" class="btn btn-delete">Delete Account</a>
+    </div>
+  </div>
 </body>
 </html>
