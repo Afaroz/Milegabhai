@@ -82,6 +82,9 @@ const productStorage = new CloudinaryStorage({
 });
 
 // Create multer upload instance for products
+
+// ✅ Local multer storage
+const upload = multer({ dest: 'uploads/' });
 const profileStorage = new CloudinaryStorage({
   cloudinary,
   params: {
