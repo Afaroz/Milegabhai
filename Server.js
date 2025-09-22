@@ -325,38 +325,53 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-
-// ✅ Upload Profile Image API Route
 app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
   try {
     const email = req.body.email;
     const file = req.file;
 
-    console.log('Email:', email);
-    console.log('File:', file);
-
     if (!email || !file) {
       return res.status(400).json({ success: false, message: 'Email and image file are required' });
     }
 
-    const imageUrl = file.path; // Cloudinary image URL
-
-    const updatedUser = await User.findOneAndUpdate(
-      { email },
-      { image: imageUrl },
-      { new: true }
-    );
-
-    if (!updatedUser) {
+    // ✅ Get existing user
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // ✅ If old image exists, delete it from Cloudinary
+    if (user.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(user.imagePublicId);
+        console.log('✅ Old image deleted from Cloudinary');
+      } catch (deleteErr) {
+        console.warn('⚠️ Failed to delete old image:', deleteErr.message);
+      }
+    }
+
+    // ✅ Upload new image to Cloudinary
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: 'profile_images'
+    });
+
+    // ✅ Save new image URL and public_id in DB
+    user.image = result.secure_url;
+    user.imagePublicId = result.public_id;
+    await user.save();
+
+    // ✅ Delete temp file (if you use multer with local uploads)
+    if (file.path && !file.path.startsWith('http')) {
+      fs.unlinkSync(file.path);
     }
 
     res.json({
       success: true,
-      message: 'Image uploaded to Cloudinary',
-      imageUrl,
-      user: updatedUser,
+      message: '✅ New profile image uploaded',
+      imageUrl: result.secure_url,
+      user
     });
+
   } catch (error) {
     console.error('❌ Error uploading profile image:', error.stack || error);
     res.status(500).json({
