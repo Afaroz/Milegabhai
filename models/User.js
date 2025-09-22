@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   location: String,
   password: { type: String, required: true },
     image: String, // ✅ optional
+    imagePublicId: String,
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
