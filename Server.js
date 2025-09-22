@@ -115,6 +115,16 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
+
+
+
+
+
+
+
+
+// ✅ Create Product API
 app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { title, price, description, condition, location, sellerPhone } = req.body;
@@ -124,17 +134,15 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Upload image to Cloudinary
+    // ✅ Upload to Cloudinary manually
     const result = await cloudinary.uploader.upload(imageFile.path, {
-      folder: 'products'
+      folder: 'products',
     });
 
-    // Delete local image file only if it's a local path, not a URL
-    if (imageFile.path && !imageFile.path.startsWith('http')) {
-      fs.unlinkSync(imageFile.path);
-    }
+    // ✅ Delete local temp file
+    fs.unlinkSync(imageFile.path);
 
-    // Save product info with Cloudinary image URL
+    // ✅ Save product info with Cloudinary image URL
     const product = new Product({
       title,
       price: Number(price),
@@ -142,7 +150,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       condition,
       location,
       sellerPhone,
-      image: result.secure_url
+      image: result.secure_url,
     });
 
     const saved = await product.save();
@@ -153,6 +161,25 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -294,25 +321,27 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-
-// ✅ Upload Profile Image API Route
-app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
+// ✅ Upload Profile Image API
+app.post('/api/uploadProfileImage', upload.single('profileImage'), async (req, res) => {
   try {
     const email = req.body.email;
     const file = req.file;
-
-    console.log('Email:', email);
-    console.log('File:', file);
 
     if (!email || !file) {
       return res.status(400).json({ success: false, message: 'Email and image file are required' });
     }
 
-    const imageUrl = file.path; // Cloudinary image URL
+    // ✅ Upload to Cloudinary manually
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: 'profiles',
+    });
+
+    // ✅ Delete local temp file
+    fs.unlinkSync(file.path);
 
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { image: imageUrl },
+      { image: result.secure_url },
       { new: true }
     );
 
@@ -322,8 +351,8 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
     res.json({
       success: true,
-      message: 'Image uploaded to Cloudinary',
-      imageUrl,
+      message: 'Profile image uploaded to Cloudinary',
+      imageUrl: result.secure_url,
       user: updatedUser,
     });
   } catch (error) {
@@ -334,9 +363,6 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
     });
   }
 });
-
-
-
 
 
 
@@ -372,6 +398,9 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+
+
+
 // API to initiate registration and send OTP
 app.post('/api/send-otp', async (req, res) => {
   try {
@@ -405,6 +434,8 @@ app.post('/api/send-otp', async (req, res) => {
     return res.status(500).json({ message: 'Error sending OTP' });
   }
 });
+
+
 
 app.post('/api/verify-otp', async (req, res) => {
   try {
@@ -463,6 +494,8 @@ app.post('/api/verify-otp', async (req, res) => {
 
 
 
+
+
 // DELETE product and Cloudinary image
 app.delete('/api/products/:id', async (req, res) => {
   const id = req.params.id;
@@ -507,8 +540,6 @@ app.delete('/api/products/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-
 
 
 
@@ -569,9 +600,6 @@ app.delete('/api/users/deleteByEmail', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-
-
 app.listen(PORT, '0.0.0.0')
   .on('listening', () => {
     console.log(`🚀 Server running at https://0.0.0.0:${PORT}`);
