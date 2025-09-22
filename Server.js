@@ -133,16 +133,8 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-console.log('💥 Uploading to Cloudinary...');
-const result = await cloudinary.uploader.upload(imageFile.path, {
-  folder: 'products'
-});
-console.log('✅ Uploaded to:', result.secure_url);
-
-    // Delete local image file only if it's a local path, not a URL
-    if (imageFile.path && !imageFile.path.startsWith('http')) {
-      fs.unlinkSync(imageFile.path);
-    }
+    // ✅ If image is already uploaded by multer-storage-cloudinary, use this:
+    const imageUrl = imageFile.path; // This is already a Cloudinary URL
 
     // Save product info with Cloudinary image URL
     const product = new Product({
