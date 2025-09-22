@@ -175,7 +175,7 @@ header {
 <div class="nav-buttons">
 <!-- Place this inside your nav/header -->
 <button class="profile-icon-btn" id="profileBtn" aria-label="Profile">
-  <i class="fas fa-user"></i>
+  <i class="fas fa-user-circle"></i>
 </button>
 
 
@@ -264,18 +264,8 @@ function displayProducts(products) {
   products.forEach(product => {
     const card = document.createElement('div');
     card.className = 'product-card';
-
-    let imageUrl = product.image;
-
-    // ✅ If it's not a full URL, construct Cloudinary image path manually
-    if (!imageUrl.startsWith('http')) {
-      const cloudName = 'dlq5khrl3'; // 🔁 Your Cloudinary cloud name
-      const folder = 'product_images'; // 🔁 Folder used in upload
-      imageUrl = `https://res.cloudinary.com/${cloudName}/image/upload/${folder}/${imageUrl}`;
-    }
-
     card.innerHTML = `
-      <img class="product-image" src="${imageUrl}" alt="${product.title}" />
+      <img class="product-image" src="${product.image}" alt="${product.title}" />
       <div class="product-info">
         <h4 class="product-title">${product.title}</h4>
         <p class="product-price">₹${product.price.toLocaleString()}</p>
@@ -283,6 +273,7 @@ function displayProducts(products) {
       </div>
     `;
 
+    // Redirect to product detail on click
     card.querySelector('.product-image').addEventListener('click', () => {
       window.location.href = `product-detail.html?id=${product._id}`;
     });
