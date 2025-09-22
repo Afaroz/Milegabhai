@@ -72,6 +72,18 @@
       text-decoration: underline;
     }
 
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      border: 1px solid #c3e6cb;
+      display: none; /* hidden by default */
+    }
+
     /* Responsive Mobile Styles */
     @media (max-width: 480px) {
       .container {
@@ -103,50 +115,79 @@
 <body>
   <div class="container">
     <h2>Sell Your Product</h2>
-    <form action="/api/products" method="POST" enctype="multipart/form-data">
+
+    <!-- ✅ SUCCESS MESSAGE -->
+    <div id="successMessage" class="success-message">
+      ✅ Your Product is Submitted Now...!
+    </div>
+
+    <!-- ✅ FORM -->
+    <form id="productForm" enctype="multipart/form-data">
       <input type="text" name="title" placeholder="Product Name" required />
-
       <textarea name="description" placeholder="Product Description" required></textarea>
-
       <select name="condition" required>
         <option value="" disabled selected>Choose Condition</option>
         <option value="New">New</option>
         <option value="Used">Used</option>
         <option value="Refurbished">Refurbished</option>
       </select>
-
       <input type="text" name="location" placeholder="Location" required />
-
       <input type="number" name="price" placeholder="Price (₹)" min="1" required />
-      
       <input type="text" id="sellerPhone" name="sellerPhone" placeholder="Your WhatsApp Number (e.g. 919812345678)" required />
-
       <input type="file" name="image" accept="image/*" required />
-
       <button type="submit">Submit</button>
     </form>
+
     <a href="index.html" class="back-link">← Back to Home</a>
   </div>
 
   <script>
+    // 🧠 Fill phone from localStorage
     function fillPhoneFromLocalStorage() {
       const userString = localStorage.getItem('user');
-      if (!userString) {
-        console.warn('No user data found in localStorage');
-        return;
-      }
-
+      if (!userString) return;
       try {
         const user = JSON.parse(userString);
         if (user.mobile) {
           document.getElementById('sellerPhone').value = user.mobile;
-        } else {
-          console.warn('Mobile number not found in stored user data');
         }
       } catch (e) {
-        console.error('Error parsing user data from localStorage:', e);
+        console.error('Error parsing user data:', e);
       }
     }
+
+    // ✅ Handle form submission
+    document.getElementById('productForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/api/products', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // ✅ Show success message
+          const successBox = document.getElementById('successMessage');
+          successBox.style.display = 'block';
+
+          // 🧹 Reset the form
+          form.reset();
+
+          // 👇 Optional: scroll to top so message is visible
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          alert('❌ Failed to submit: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        alert('❌ Error submitting form: ' + error.message);
+      }
+    });
 
     window.addEventListener('DOMContentLoaded', fillPhoneFromLocalStorage);
   </script>
