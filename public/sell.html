@@ -81,10 +81,9 @@
       text-align: center;
       font-weight: bold;
       border: 1px solid #c3e6cb;
-      display: none; /* hidden by default */
+      display: none;
     }
 
-    /* Responsive Mobile Styles */
     @media (max-width: 480px) {
       .container {
         width: 90vw;
@@ -142,54 +141,61 @@
   </div>
 
   <script>
-    // 🧠 Fill phone from localStorage
-    function fillPhoneFromLocalStorage() {
+    window.addEventListener('DOMContentLoaded', () => {
+      // Fill phone from localStorage
       const userString = localStorage.getItem('user');
-      if (!userString) return;
-      try {
-        const user = JSON.parse(userString);
-        if (user.mobile) {
-          document.getElementById('sellerPhone').value = user.mobile;
+      if (userString) {
+        try {
+          const user = JSON.parse(userString);
+          if (user.mobile) {
+            document.getElementById('sellerPhone').value = user.mobile;
+          }
+        } catch (e) {
+          console.error('Error parsing user:', e);
         }
-      } catch (e) {
-        console.error('Error parsing user data:', e);
       }
-    }
 
-    // ✅ Handle form submission
-    document.getElementById('productForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
+      // Handle form submit
+      document.getElementById('productForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      const form = e.target;
-      const formData = new FormData(form);
+        const form = e.target;
+        const formData = new FormData(form);
+        const successBox = document.getElementById('successMessage');
 
-      try {
-        const response = await fetch('/api/products', {
-          method: 'POST',
-          body: formData
-        });
+        try {
+          const response = await fetch('/api/products', {
+            method: 'POST',
+            body: formData
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (response.ok) {
-          // ✅ Show success message
-          const successBox = document.getElementById('successMessage');
-          successBox.style.display = 'block';
+          console.log('Server response:', data);
 
-          // 🧹 Reset the form
-          form.reset();
+          if (response.ok) {
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
-          // 👇 Optional: scroll to top so message is visible
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          alert('❌ Failed to submit: ' + (data.error || 'Unknown error'));
+            // Show success message
+            successBox.style.display = 'block';
+
+            // Hide it after 5 seconds
+            setTimeout(() => {
+              successBox.style.display = 'none';
+            }, 5000);
+
+            // Reset form
+            form.reset();
+          } else {
+            alert('❌ Failed to submit: ' + (data.error || 'Unknown error'));
+          }
+        } catch (err) {
+          alert('❌ Submission error: ' + err.message);
+          console.error('Submission error:', err);
         }
-      } catch (error) {
-        alert('❌ Error submitting form: ' + error.message);
-      }
+      });
     });
-
-    window.addEventListener('DOMContentLoaded', fillPhoneFromLocalStorage);
   </script>
 </body>
 </html>
