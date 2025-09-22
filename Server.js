@@ -124,7 +124,6 @@ app.post('/login', async (req, res) => {
 
 
 
-// ✅ Create Product API
 app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { title, price, description, condition, location, sellerPhone } = req.body;
@@ -134,15 +133,17 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // ✅ Upload to Cloudinary manually
+    // Upload image to Cloudinary
     const result = await cloudinary.uploader.upload(imageFile.path, {
-      folder: 'products',
+      folder: 'products'
     });
 
-    // ✅ Delete local temp file
-    fs.unlinkSync(imageFile.path);
+    // Delete local image file only if it's a local path, not a URL
+    if (imageFile.path && !imageFile.path.startsWith('http')) {
+      fs.unlinkSync(imageFile.path);
+    }
 
-    // ✅ Save product info with Cloudinary image URL
+    // Save product info with Cloudinary image URL
     const product = new Product({
       title,
       price: Number(price),
@@ -150,7 +151,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
       condition,
       location,
       sellerPhone,
-      image: result.secure_url,
+      image: result.secure_url
     });
 
     const saved = await product.save();
@@ -161,6 +162,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 
 
@@ -321,27 +323,25 @@ app.delete('/api/cart', async (req, res) => {
 
 
 
-// ✅ Upload Profile Image API
-app.post('/api/uploadProfileImage', upload.single('profileImage'), async (req, res) => {
+
+// ✅ Upload Profile Image API Route
+app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async (req, res) => {
   try {
     const email = req.body.email;
     const file = req.file;
+
+    console.log('Email:', email);
+    console.log('File:', file);
 
     if (!email || !file) {
       return res.status(400).json({ success: false, message: 'Email and image file are required' });
     }
 
-    // ✅ Upload to Cloudinary manually
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: 'profiles',
-    });
-
-    // ✅ Delete local temp file
-    fs.unlinkSync(file.path);
+    const imageUrl = file.path; // Cloudinary image URL
 
     const updatedUser = await User.findOneAndUpdate(
       { email },
-      { image: result.secure_url },
+      { image: imageUrl },
       { new: true }
     );
 
@@ -351,8 +351,8 @@ app.post('/api/uploadProfileImage', upload.single('profileImage'), async (req, r
 
     res.json({
       success: true,
-      message: 'Profile image uploaded to Cloudinary',
-      imageUrl: result.secure_url,
+      message: 'Image uploaded to Cloudinary',
+      imageUrl,
       user: updatedUser,
     });
   } catch (error) {
@@ -363,6 +363,9 @@ app.post('/api/uploadProfileImage', upload.single('profileImage'), async (req, r
     });
   }
 });
+
+
+
 
 
 
