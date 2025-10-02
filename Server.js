@@ -376,14 +376,13 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
-
-
 // In-memory store for OTPs and pending registrations
 // Structure: {
-//    "<email>": { otp: "123456", expires: Date, regData: { fullname, email, mobile, location, password } }
+//   "<email>": { otp: "123456", expires: Date, regData: { fullname, email, mobile, location, password } }
 // }
 const pendingRegs = {};
 
+// ✅ FIXED: OTP Generator
 function generateOTP(length = 6) {
   const digits = '0123456789';
   let otp = '';
@@ -393,16 +392,16 @@ function generateOTP(length = 6) {
   return otp;
 }
 
+// ✅ SMTP Transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT),
-  secure: false,  // true for 465, false for other ports
+  port: parseInt(process.env.SMTP_PORT, 10),
+  secure: process.env.SMTP_PORT === '465',  // Use SSL for port 465
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   }
 });
-
 
 
 app.post('/api/send-otp', async (req, res) => {
