@@ -405,27 +405,41 @@ const transporter = nodemailer.createTransport({
 
 
 
-
-// API to initiate registration and send OTP
 app.post('/api/send-otp', async (req, res) => {
   try {
     const { fullname, email, mobile, location, password } = req.body;
+
+    // Validate all fields are present
     if (!fullname || !email || !mobile || !location || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
+    // Generate OTP and expiry
     const otp = generateOTP(6);
-    const expires = new Date(Date.now() + (Number(process.env.OTP_EXPIRY_MINUTES) * 60 * 1000));
+    const expires = new Date(Date.now() + Number(process.env.OTP_EXPIRY_MINUTES) * 60 * 1000);
 
-    // Save pending registration
+    // Save pending registration in-memory
     pendingRegs[email] = {
       otp,
       expires,
       regData: { fullname, email, mobile, location, password }
     };
 
+    // Verify SMTP transporter connection before sending
+    await new Promise((resolve, reject) => {
+      transporter.verify((error, success) => {
+        if (error) {
+          console.error('SMTP transporter verification failed:', error);
+          reject(error);
+        } else {
+          console.log('SMTP transporter is ready');
+          resolve(success);
+        }
+      });
+    });
+
     // Send OTP email
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"No-Reply" <${process.env.SMTP_USER}>`,
       to: email,
       subject: 'Your OTP Code',
@@ -433,10 +447,12 @@ app.post('/api/send-otp', async (req, res) => {
       html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
     });
 
+    console.log('OTP email sent:', info.messageId);
+
     return res.json({ message: 'OTP sent' });
   } catch (err) {
     console.error('Error in /api/send-otp:', err);
-    return res.status(500).json({ message: 'Error sending OTP' });
+    return res.status(500).json({ message: 'Error sending OTP', error: err.message });
   }
 });
 
