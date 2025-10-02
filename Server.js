@@ -374,6 +374,16 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 const axios = require('axios');
+// ✅ OTP Generator
+function generateOTP(length = 6) {
+  const digits = '0123456789';
+  let otp = '';
+  for (let i = 0; i < length; i++) {
+    otp += digits[Math.floor(Math.random() * digits.length)];
+  }
+  return otp;
+}
+
 
 app.post('/api/send-otp', async (req, res) => {
   try {
