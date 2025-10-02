@@ -373,84 +373,48 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
-
-
-
-// In-memory store for OTPs and pending registrations
-// Structure: {
-//   "<email>": { otp: "123456", expires: Date, regData: { fullname, email, mobile, location, password } }
-// }
-const pendingRegs = {};
-
-// ✅ FIXED: OTP Generator
-function generateOTP(length = 6) {
-  const digits = '0123456789';
-  let otp = '';
-  for (let i = 0; i < length; i++) {
-    otp += digits[Math.floor(Math.random() * digits.length)];
-  }
-  return otp;
-}
-
-// ✅ SMTP Transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT, 10),
-  secure: process.env.SMTP_PORT === '587',  // Use SSL for port 465
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
-
+const axios = require('axios');
 
 app.post('/api/send-otp', async (req, res) => {
   try {
     const { fullname, email, mobile, location, password } = req.body;
 
-    // Validate all fields are present
     if (!fullname || !email || !mobile || !location || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Generate OTP and expiry
     const otp = generateOTP(6);
     const expires = new Date(Date.now() + Number(process.env.OTP_EXPIRY_MINUTES) * 60 * 1000);
 
-    // Save pending registration in-memory
     pendingRegs[email] = {
       otp,
       expires,
       regData: { fullname, email, mobile, location, password }
     };
 
-    // Verify SMTP transporter connection before sending
-    await new Promise((resolve, reject) => {
-      transporter.verify((error, success) => {
-        if (error) {
-          console.error('SMTP transporter verification failed:', error);
-          reject(error);
-        } else {
-          console.log('SMTP transporter is ready');
-          resolve(success);
-        }
-      });
-    });
-
-    // Send OTP email
-    const info = await transporter.sendMail({
-      from: `"No-Reply" <${process.env.SMTP_USER}>`,
+    // Prepare email data for Resend API
+    const emailData = {
+      from: 'No-Reply <no-reply@milegabhai.onrender.com>',  // Updated to your domain
       to: email,
       subject: 'Your OTP Code',
       text: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.`,
       html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
+    };
+
+    // Call Resend API
+    const response = await axios.post('https://api.resend.com/emails', emailData, {
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    console.log('OTP email sent:', info.messageId);
+    console.log('OTP email sent:', response.data);
 
     return res.json({ message: 'OTP sent' });
+
   } catch (err) {
-    console.error('Error in /api/send-otp:', err);
+    console.error('Error in /api/send-otp:', err.response?.data || err.message || err);
     return res.status(500).json({ message: 'Error sending OTP', error: err.message });
   }
 });
