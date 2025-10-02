@@ -374,7 +374,19 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 const axios = require('axios');
+
 // ✅ OTP Generator
+// In-memory store for OTPs and pending registrations
+// Structure:
+// {
+//   "<email>": {
+//     otp: "123456",
+//     expires: Date,
+//     regData: { fullname, email, mobile, location, password }
+//   }
+// }
+const pendingRegs = {};
+
 function generateOTP(length = 6) {
   const digits = '0123456789';
   let otp = '';
