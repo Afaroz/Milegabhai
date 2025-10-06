@@ -372,31 +372,32 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
+const nodemailer = require('nodemailer');
 
-const axios = require('axios');
+async function sendOtpEmail(toEmail, otp) {
+  // Create reusable transporter object using SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false, // use TLS - false for port 587
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
-// ✅ OTP Generator
-// In-memory store for OTPs and pending registrations
-// Structure:
-// {
-//   "<email>": {
-//     otp: "123456",
-//     expires: Date,
-//     regData: { fullname, email, mobile, location, password }
-//   }
-// }
-const pendingRegs = {};
+  let mailOptions = {
+    from: `"No Reply" <${process.env.SMTP_USER}>`,
+    to: toEmail,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.`,
+    html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`,
+  };
 
-function generateOTP(length = 6) {
-  const digits = '0123456789';
-  let otp = '';
-  for (let i = 0; i < length; i++) {
-    otp += digits[Math.floor(Math.random() * digits.length)];
-  }
-  return otp;
+  await transporter.sendMail(mailOptions);
 }
 
-
+// Your existing OTP generation and API route handler:
 app.post('/api/send-otp', async (req, res) => {
   try {
     const { fullname, email, mobile, location, password } = req.body;
@@ -414,33 +415,18 @@ app.post('/api/send-otp', async (req, res) => {
       regData: { fullname, email, mobile, location, password }
     };
 
-    // Prepare email data for Resend API
-    const emailData = {
-      from: 'No-Reply <no-reply@milegabhai.onrender.com>',  // Updated to your domain
-      to: email,
-      subject: 'Your OTP Code',
-      text: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.`,
-      html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
-    };
+    // Send OTP email via SMTP
+    await sendOtpEmail(email, otp);
 
-    // Call Resend API
-    const response = await axios.post('https://api.resend.com/emails', emailData, {
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    console.log('OTP email sent:', response.data);
+    console.log('OTP email sent to:', email);
 
     return res.json({ message: 'OTP sent' });
 
   } catch (err) {
-    console.error('Error in /api/send-otp:', err.response?.data || err.message || err);
+    console.error('Error in /api/send-otp:', err);
     return res.status(500).json({ message: 'Error sending OTP', error: err.message });
   }
 });
-
 
 
 app.post('/api/verify-otp', async (req, res) => {
