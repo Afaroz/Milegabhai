@@ -369,30 +369,20 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
-async function sendOtpEmail(toEmail, otp) {
-  // Create reusable transporter object using SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: false, // use TLS - false for port 587
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
 
-  let mailOptions = {
-    from: `"No Reply" <${process.env.SMTP_USER}>`,
-    to: toEmail,
-    subject: 'Your OTP Code',
-    text: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.`,
-    html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`,
-  };
 
-  await transporter.sendMail(mailOptions);
+// In-memory OTP store
+const pendingRegs = {};
+
+function generateOTP(length = 6) {
+  const digits = '0123456789';
+  let otp = '';
+  for (let i = 0; i < length; i++) {
+    otp += digits[Math.floor(Math.random() * digits.length)];
+  }
+  return otp;
 }
 
-// Your existing OTP generation and API route handler:
 app.post('/api/send-otp', async (req, res) => {
   try {
     const { fullname, email, mobile, location, password } = req.body;
@@ -400,6 +390,17 @@ app.post('/api/send-otp', async (req, res) => {
     if (!fullname || !email || !mobile || !location || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
+
+    // SMTP transporter setup
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,       // smtp.gmail.com
+      port: Number(process.env.SMTP_PORT), // 587
+      secure: false,                      // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,     // your gmail address
+        pass: process.env.SMTP_PASS      // your gmail app password (16 char)
+      }
+    });
 
     const otp = generateOTP(6);
     const expires = new Date(Date.now() + Number(process.env.OTP_EXPIRY_MINUTES) * 60 * 1000);
@@ -410,16 +411,25 @@ app.post('/api/send-otp', async (req, res) => {
       regData: { fullname, email, mobile, location, password }
     };
 
-    // Send OTP email via SMTP
-    await sendOtpEmail(email, otp);
+    // Prepare mail options
+    const mailOptions = {
+      from: `"No-Reply" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Your OTP Code',
+      text: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.`,
+      html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
+    };
 
-    console.log('OTP email sent to:', email);
+    // Send email
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log('OTP email sent:', info.messageId);
 
     return res.json({ message: 'OTP sent' });
 
   } catch (err) {
     console.error('Error in /api/send-otp:', err);
-    return res.status(500).json({ message: 'Error sending OTP', error: err.message });
+    return res.status(500).json({ message: 'Error sending OTP', error: err.message || err });
   }
 });
 
