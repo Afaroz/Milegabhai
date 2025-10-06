@@ -369,11 +369,6 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
-
-
-
-const nodemailer = require('nodemailer');
-
 async function sendOtpEmail(toEmail, otp) {
   // Create reusable transporter object using SMTP transport
   let transporter = nodemailer.createTransport({
