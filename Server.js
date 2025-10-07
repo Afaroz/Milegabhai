@@ -53,7 +53,7 @@ app.use(cors({
 }));
 // ✅ CORS - Enable communication between frontend & backend
 app.use(cors({
-  origin: 'https://milegabhai.vercel.com',
+  origin: 'https://milegabhai.vercel.app',
   methods: ['GET', 'POST'],
   credentials: true // Only if you're using cookies/sessions
 }));
