@@ -51,6 +51,12 @@ app.use(cors({
   methods: ['GET', 'POST'],
   credentials: true // Only if you're using cookies/sessions
 }));
+// ✅ CORS - Enable communication between frontend & backend
+app.use(cors({
+  origin: 'https://milegabhai.vercel.com',
+  methods: ['GET', 'POST'],
+  credentials: true // Only if you're using cookies/sessions
+}));
 
 // ✅ MongoDB Connection
 const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/myappdb?retryWrites=true&w=majority';
