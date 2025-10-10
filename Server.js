@@ -376,6 +376,8 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
+const axios = require('axios');
+require('dotenv').config();
 
 // In-memory OTP store
 const pendingRegs = {};
@@ -388,62 +390,58 @@ function generateOTP(length = 6) {
   }
   return otp;
 }
+
 app.post('/api/send-otp', async (req, res) => {
   try {
-    require('dotenv').config(); // in case it's not already at the top
-
     const { fullname, email, mobile, location, password } = req.body;
 
     if (!fullname || !email || !mobile || !location || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Debug: Log env values
-    console.log("SMTP_USER:", process.env.SMTP_USER);
-    console.log("SMTP_PASS:", process.env.SMTP_PASS ? "Provided" : "Missing");
-    console.log("SMTP_HOST:", process.env.SMTP_HOST);
-    console.log("SMTP_PORT:", process.env.SMTP_PORT);
-    
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-      }
-    });
-
-    // Verify connection
-    await transporter.verify();
-
     const otp = generateOTP(6);
     const expires = new Date(Date.now() + Number(process.env.OTP_EXPIRY_MINUTES) * 60 * 1000);
 
+    // Store OTP and registration data
     pendingRegs[email] = {
       otp,
       expires,
       regData: { fullname, email, mobile, location, password }
     };
 
-    const mailOptions = {
-      from: `"No-Reply" <${process.env.SMTP_USER}>`,
-      to: email,
+    // Send email using Brevo (Sendinblue) API
+    const emailPayload = {
+      sender: {
+        name: 'MyApp',
+        email: 'noreply@yourdomain.com' // You can use any valid sender
+      },
+      to: [{ email }],
       subject: 'Your OTP Code',
-      text: `Your OTP code is ${otp}. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.`,
-      html: `<p>Your OTP code is <b>${otp}</b>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
+      htmlContent: `<p>Your OTP code is <strong>${otp}</strong>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    const response = await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      emailPayload,
+      {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      }
+    );
 
-    console.log('OTP email sent:', info.messageId);
+    console.log('✅ OTP email sent via Brevo:', response.data.messageId || 'Success');
 
-    return res.json({ message: 'OTP sent' });
+    return res.json({ message: 'OTP sent successfully' });
 
   } catch (err) {
-    console.error('Error in /api/send-otp:', err);
-    return res.status(500).json({ message: 'Error sending OTP', error: err.message || err });
+    console.error('❌ Error in /api/send-otp:', err.response?.data || err.message);
+    return res.status(500).json({
+      message: 'Error sending OTP',
+      error: err.response?.data || err.message
+    });
   }
 });
 
