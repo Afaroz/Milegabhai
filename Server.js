@@ -11,6 +11,7 @@ const Cart = require('./models/Cart'); // ✅ NOT '../models/Cart'
 require('dotenv').config();
 const Product = require('./models/Product');
 
+
 // Mongo models (user schema remains)
 const userSchema = new mongoose.Schema({
   fullname: String,
@@ -45,10 +46,19 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+const allowedOrigins = ['https://milegabhai.onrender.com', 'https://milegabhai.vercel.app'];
+
 app.use(cors({
-  origin: ['https://milegabhai.onrender.com', 'https://milegabhai.vercel.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // mobile apps or curl requests
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
 
@@ -203,6 +213,10 @@ app.get('/api/products', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+
+
 
 app.get('/api/products/:id', async (req, res) => {
   try {
