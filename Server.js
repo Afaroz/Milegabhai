@@ -38,8 +38,6 @@ const User = mongoose.model('User', userSchema); // Assuming userSchema is defin
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// ✅ Serve static files (like .html, .css, .js) from the "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
 
 // ✅ Middleware
 app.use(express.json({ limit: '10mb' }));
@@ -534,6 +532,9 @@ app.delete('/api/users/deleteByEmail', async (req, res) => {
     console.error('Delete error:', error);
     res.status(500).json({ error: 'Server error' });
   }
+  // ✅ Serve static files (like .html, .css, .js) from the "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 });
 app.listen(PORT, '0.0.0.0')
   .on('listening', () => {
