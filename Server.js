@@ -369,7 +369,7 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
-
+const User = require('./models/User'); // adjust path if needed
 
 app.post('/api/register', async (req, res) => {
   try {
