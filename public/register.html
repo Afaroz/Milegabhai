@@ -5,105 +5,27 @@
   <title>User Registration</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background-color: #f1f3f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 15px;
-    }
-    .form-container {
-      background-color: #fff;
-      padding: 35px 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 420px;
-    }
-    .form-container h2 {
-      margin-bottom: 25px;
-      color: #2a2a2a;
-      text-align: center;
-      font-size: 24px;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      font-size: 15px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 18px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 15px;
-      transition: border-color 0.3s;
-    }
-    input:focus {
-      border-color: #2874f0;
-      outline: none;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background-color: #2874f0;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #0b57d0;
-    }
-    .terms-container {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-    .terms-container label {
-      font-weight: normal;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .terms-container a {
-      color: #2874f0;
-      text-decoration: none;
-    }
-    .footer-text {
-      margin-top: 20px;
-      text-align: center;
-      color: #555;
-      font-size: 14px;
-    }
-    .footer-text a {
-      color: #2874f0;
-      text-decoration: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #f1f3f6; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 15px; }
+    .form-container { background-color: #fff; padding: 35px 25px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
+    .form-container h2 { margin-bottom: 25px; color: #2a2a2a; text-align: center; font-size: 24px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 15px; }
+    input { width: 100%; padding: 12px; margin-bottom: 18px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; transition: border-color 0.3s; }
+    input:focus { border-color: #2874f0; outline: none; }
+    button { width: 100%; padding: 14px; background-color: #2874f0; color: white; font-size: 16px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; }
+    button:hover { background-color: #0b57d0; }
+    .terms-container { margin-bottom: 20px; text-align: center; }
+    .terms-container label { font-weight: normal; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+    .terms-container a { color: #2874f0; text-decoration: none; }
+    .footer-text { margin-top: 20px; text-align: center; color: #555; font-size: 14px; }
+    .footer-text a { color: #2874f0; text-decoration: none; }
     @media (max-width: 480px) {
-      .form-container {
-        padding: 30px 20px;
-      }
-      input, button {
-        font-size: 14px;
-        padding: 12px;
-      }
-      .form-container h2 {
-        font-size: 22px;
-      }
+      .form-container { padding: 30px 20px; }
+      input, button { font-size: 14px; padding: 12px; }
+      .form-container h2 { font-size: 22px; }
     }
+    .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 8px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -128,10 +50,7 @@
       <div class="terms-container">
         <label>
           <input type="checkbox" id="terms" required />
-          <span>
-            I agree to the 
-            <a href="policy.html" target="_blank">Terms & Conditions</a>
-          </span>
+          <span>I agree to the <a href="policy.html" target="_blank">Terms & Conditions</a></span>
         </label>
       </div>
 
@@ -143,73 +62,60 @@
     </div>
   </div>
 
-<style>
-  /* Spinner styles */
-  .spinner {
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 8px;
-  }
+  <script>
+    const API_URL = 'https://milegabhai.onrender.com/api/register'; // Correct API endpoint
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-</style>
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-<script>
-  document.getElementById('registerForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.textContent;
 
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalText = btn.textContent;
+      // Disable button and show spinner
+      btn.disabled = true;
+      btn.textContent = 'Registering';
+      const spinner = document.createElement('span');
+      spinner.classList.add('spinner');
+      btn.appendChild(spinner);
 
-    // Disable button and show a spinner
-    btn.disabled = true;
-    btn.textContent = 'Registering';
-    const spinner = document.createElement('span');
-    spinner.classList.add('spinner');
-    btn.appendChild(spinner);
+      const data = {
+        fullname: document.getElementById('fullname').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        mobile: document.getElementById('mobile').value.trim(),
+        location: document.getElementById('location').value.trim(),
+        password: document.getElementById('password').value
+      };
 
-    const data = {
-      fullname: document.getElementById('fullname').value,
-      email: document.getElementById('email').value,
-      mobile: document.getElementById('mobile').value,
-      location: document.getElementById('location').value,
-      password: document.getElementById('password').value
-    };
+      try {
+        const resp = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
 
-    try {
-      const resp = await fetch('https://milegabhai.onrender.com/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+        // Always check if response is JSON
+        const contentType = resp.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Server did not return JSON');
+        }
 
-      const result = await resp.json();
+        const result = await resp.json();
 
-      if (resp.ok) {
-        alert('🎉 Registration successful!');
-        window.location.href = '/login.html';
-      } else {
-        alert('❌ Error: ' + result.message);
+        if (resp.ok) {
+          alert('🎉 Registration successful!');
+          window.location.href = '/login.html';
+        } else {
+          alert('❌ Error: ' + (result.message || 'Unknown error'));
+        }
+
+      } catch (err) {
+        alert('🚨 Server error. Please try again.');
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
       }
-
-    } catch (err) {
-      alert('🚨 Server error. Please try again.');
-      console.error(err);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = originalText;
-    }
-  });
-</script>
-
+    });
+  </script>
 </body>
 </html>
