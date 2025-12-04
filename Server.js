@@ -59,7 +59,7 @@ app.use(cors({
 }));
 
 // ✅ MongoDB Connection
-const dbURI = 'mongodb+srv://Afaroz:Afaroz%40123@cluster0.dcnjbko.mongodb.net/myappdb?retryWrites=true&w=majority';
+const dbURI = process.env.MONGODB_URI;
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
@@ -374,110 +374,28 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
+const bcrypt = require('bcryptjs');
+const User = require('./models/User'); // adjust path if needed
 
-
-const axios = require('axios');
-require('dotenv').config();
-
-// In-memory OTP store
-const pendingRegs = {};
-
-function generateOTP(length = 6) {
-  const digits = '0123456789';
-  let otp = '';
-  for (let i = 0; i < length; i++) {
-    otp += digits[Math.floor(Math.random() * digits.length)];
-  }
-  return otp;
-}
-
-app.post('/api/send-otp', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   try {
     const { fullname, email, mobile, location, password } = req.body;
 
+    // Validate required fields
     if (!fullname || !email || !mobile || !location || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const otp = generateOTP(6);
-    const expires = new Date(Date.now() + Number(process.env.OTP_EXPIRY_MINUTES) * 60 * 1000);
-
-    // Store OTP and registration data
-    pendingRegs[email] = {
-      otp,
-      expires,
-      regData: { fullname, email, mobile, location, password }
-    };
-
-    // Send email using Brevo (Sendinblue) API
-    const emailPayload = {
-      sender: {
-        name: 'MyApp',
-        email: 'noreply@yourdomain.com' // You can use any valid sender
-      },
-      to: [{ email }],
-      subject: 'Your OTP Code',
-      htmlContent: `<p>Your OTP code is <strong>${otp}</strong>. It will expire in ${process.env.OTP_EXPIRY_MINUTES} minutes.</p>`
-    };
-
-    const response = await axios.post(
-      'https://api.brevo.com/v3/smtp/email',
-      emailPayload,
-      {
-        headers: {
-          'api-key': process.env.BREVO_API_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
-    );
-
-    console.log('✅ OTP email sent via Brevo:', response.data.messageId || 'Success');
-
-    return res.json({ message: 'OTP sent successfully' });
-
-  } catch (err) {
-    console.error('❌ Error in /api/send-otp:', err.response?.data || err.message);
-    return res.status(500).json({
-      message: 'Error sending OTP',
-      error: err.response?.data || err.message
-    });
-  }
-});
-
-
-app.post('/api/verify-otp', async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    if (!email || !otp) {
-      return res.status(400).json({ message: 'Email and OTP are required' });
-    }
-
-    const pending = pendingRegs[email];
-    if (!pending) {
-      return res.status(400).json({ message: 'No OTP request found for this email' });
-    }
-
-    if (pending.expires < new Date()) {
-      delete pendingRegs[email];
-      return res.status(400).json({ message: 'OTP has expired' });
-    }
-
-    if (pending.otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
-    }
-
-    // ✅ Check if user already exists
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      delete pendingRegs[email];
-      return res.status(409).json({ message: 'Email is already registered' });
+      return res.status(409).json({ message: 'Email already registered' });
     }
 
-    const { fullname, mobile, location, password } = pending.regData;
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create new user
     const newUser = new User({
       fullname,
       email,
@@ -489,14 +407,12 @@ app.post('/api/verify-otp', async (req, res) => {
 
     await newUser.save();
 
-    console.log('✅ User registered:', newUser);
-
-    delete pendingRegs[email];
+    console.log('✅ User Registered:', newUser.email);
 
     return res.json({ message: 'Registration successful' });
 
   } catch (err) {
-    console.error('❌ Error in /api/verify-otp:', err);
+    console.error('❌ Registration Error:', err);
     return res.status(500).json({ message: 'Internal Server Error', error: err.message });
   }
 });
