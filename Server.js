@@ -46,13 +46,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const allowedOrigins = ['https://milegabhai.onrender.com', 'https://milegabhai.vercel.app'];
+const allowedOrigins = ['https://milegabhai.vercel.app'];
 
 app.use(cors({
-  origin: function(origin, callback){
-    if(!origin) return callback(null, true); // mobile apps or curl requests
-    if(allowedOrigins.indexOf(origin) === -1){
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); // mobile apps or curl
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'CORS policy: access denied from this origin.';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
