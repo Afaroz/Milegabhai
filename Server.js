@@ -45,18 +45,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ CORS - Enable communication between frontend & backend
 app.use(cors({
-  origin: 'https://milegabhai.onrender.com',
-  methods: ['GET', 'POST'],
-  credentials: true // Only if you're using cookies/sessions
+  origin: ['https://milegabhai.onrender.com', 'https://milegabhai.vercel.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
-// ✅ CORS - Enable communication between frontend & backend
-app.use(cors({
-  origin: 'https://milegabhai.vercel.app',
-  methods: ['GET', 'POST'],
-  credentials: true // Only if you're using cookies/sessions
-}));
+
 
 // ✅ MongoDB Connection
 const dbURI = process.env.MONGODB_URI;
