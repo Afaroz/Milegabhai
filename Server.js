@@ -46,7 +46,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const allowedOrigins = ['https://milegabhai.vercel.app'];
+const allowedOrigins = [  'https://milegabhai.vercel.app',
+  'https://milegabhai.onrender.com'];
 
 app.use(cors({
   origin: function(origin, callback) {
