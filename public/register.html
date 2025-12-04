@@ -170,9 +170,9 @@
     const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
 
-    // Disable button and show loading spinner
+    // Disable button and show a spinner
     btn.disabled = true;
-    btn.textContent = 'Sending OTP';
+    btn.textContent = 'Registering';
     const spinner = document.createElement('span');
     spinner.classList.add('spinner');
     btn.appendChild(spinner);
@@ -186,25 +186,25 @@
     };
 
     try {
-      const resp = await fetch('/api/send-otp', {
+      const resp = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      const j = await resp.json();
+
+      const result = await resp.json();
 
       if (resp.ok) {
-        sessionStorage.setItem('regData', JSON.stringify(data));
-        alert('OTP sent to your email. Please check.');
-        window.location.href = '/verify.html';
+        alert('🎉 Registration successful!');
+        window.location.href = '/login.html';
       } else {
-        alert('Error: ' + j.message);
+        alert('❌ Error: ' + result.message);
       }
+
     } catch (err) {
-      alert('Failed to send OTP. Please try again.');
+      alert('🚨 Server error. Please try again.');
       console.error(err);
     } finally {
-      // Reset button to original state
       btn.disabled = false;
       btn.textContent = originalText;
     }
