@@ -22,8 +22,7 @@ const userSchema = new mongoose.Schema({
   image: String
 });
 
-  // ✅ Serve static files (like .html, .css, .js) from the "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 require('dotenv').config();
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
@@ -61,7 +60,8 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
-
+  // ✅ Serve static files (like .html, .css, .js) from the "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ✅ MongoDB Connection
 const dbURI = process.env.MONGODB_URI;
