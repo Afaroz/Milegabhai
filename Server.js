@@ -186,42 +186,67 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
 
 
 
-
+// ✅ GET ALL PRODUCTS + SEARCH
 app.get('/api/products', async (req, res) => {
   try {
-    const query = req.query.search;
-    const filter = query ? { title: { $regex: query, $options: 'i' } } : {};
-    console.log('🔍 Search query:', query || 'none');
-    console.log('📦 Filter used:', filter);
+    const search = req.query.search || "";
+    
+    console.log("🔍 Search received:", search);
+
+    let filter = {};
+
+    if (search.trim() !== "") {
+      filter = {
+        title: { $regex: search, $options: "i" }
+      };
+    }
+
+    console.log("📦 Filter applied:", filter);
 
     const products = await Product.find(filter).sort({ createdAt: -1 });
 
-    console.log(`🧾 Found ${products.length} products`);
-    res.json(products);
+    console.log(`🧾 Products found: ${products.length}`);
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      products
+    });
+
   } catch (error) {
-    console.error('❌ Error fetching products:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("❌ Error loading products:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 
+
+// ✅ GET PRODUCT BY ID
 app.get('/api/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.status(200).json({ success: true, product });
+
   } catch (error) {
-    console.error('❌ Error fetching product by ID:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("❌ Error loading product:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 
+
+// ✅ ADD TO CART
 app.post('/api/cart', async (req, res) => {
   try {
-    console.log('💬 Request Body:', req.body);
+    console.log("💬 Request Body:", req.body);
+
     const { userId, productId, quantity } = req.body;
 
     if (!userId || !productId) {
-      return res.status(400).json({ message: 'Missing userId or productId' });
+      return res.status(400).json({ success: false, message: "Missing userId or productId" });
     }
 
     const cartItem = new Cart({
@@ -230,17 +255,21 @@ app.post('/api/cart', async (req, res) => {
       quantity: quantity || 1
     });
 
-    const savedItem = await cartItem.save(); // 💾 THIS saves to MongoDB
+    const savedItem = await cartItem.save();
 
-    res.status(201).json({
-      message: '✅ Product added to cart successfully',
-      cart: [savedItem]
+    return res.status(201).json({
+      success: true,
+      message: "✅ Product added to cart",
+      cartItem: savedItem
     });
+
   } catch (err) {
-    console.error('❌ Failed to save cart:', err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error("❌ Error in cart:", err);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
+
+
 
 app.get('/api/cart', async (req, res) => {
   const userEmail = req.query.email;
