@@ -368,7 +368,6 @@ app.post('/api/uploadProfileImage', profileUpload.single('profileImage'), async 
 
 
 
-const bcrypt = require('bcrypt'); // Add this
 
 app.post('/api/register', async (req, res) => {
   try {
