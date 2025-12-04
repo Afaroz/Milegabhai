@@ -1,4 +1,8 @@
 export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+
   try {
     const response = await fetch("https://milegabhai.onrender.com/api/login", {
       method: "POST",
@@ -8,7 +12,9 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     res.status(response.status).json(data);
+
   } catch (err) {
-    res.status(500).json({ message: "Proxy error" });
+    console.error(err);
+    res.status(500).json({ message: "Render backend not reachable" });
   }
 }
